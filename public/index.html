@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="icon.svg" />
+<meta name="theme-color" content="#223027" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="HQ" />
+<title>HQ — Mood</title>
+<style>
+  :root {
+    --paper: #E9ECE4;
+    --paper-raised: #F1F3EC;
+    --ink: #223027;
+    --ink-soft: #5B6B5E;
+    --rule: #C7CCBC;
+    --accent: #A9821F;
+    --accent-ink: #5C4712;
+    --rough: #8B5E6B;
+    --low: #7C8B99;
+    --okay: #A9821F;
+    --good: #5C8A66;
+    --great: #2F6558;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  #root {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    min-height: 100vh;
+    padding: 28px 18px 50px;
+    display: flex;
+    justify-content: center;
+  }
+  #inner { width: 100%; max-width: 600px; }
+
+  .masthead {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 12px;
+  }
+  .masthead h1 {
+    font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    font-weight: 600;
+    font-size: 27px;
+    margin: 0;
+  }
+  .masthead .today { font-size: 12.5px; color: var(--ink-soft); text-align: right; }
+
+  nav.tabs {
+    display: flex;
+    gap: 22px;
+    margin: 16px 0 26px;
+    border-bottom: 1px solid var(--rule);
+  }
+  nav.tabs .tab {
+    font-size: 14.5px;
+    padding: 8px 2px 11px;
+    position: relative;
+    color: var(--ink-soft);
+  }
+  nav.tabs .tab.active { color: var(--ink); }
+  nav.tabs .tab.active::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+    height: 2px; background: var(--accent);
+  }
+  nav.tabs .tab.soon { opacity: 0.55; font-style: italic; }
+  nav.tabs .tab.soon .soon-tag {
+    font-size: 10px; margin-left: 4px; border: 1px solid var(--rule);
+    border-radius: 8px; padding: 1px 6px; vertical-align: 1px;
+  }
+
+  .streak-line {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13.5px; color: var(--ink-soft);
+    margin-bottom: 22px; padding: 10px 12px;
+    background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 4px;
+  }
+  .streak-num {
+    font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    font-weight: 700; font-size: 18px; color: var(--ink);
+  }
+
+  .block { margin-bottom: 30px; }
+  .block-head { margin-bottom: 12px; }
+  .block-head h2 {
+    font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    font-size: 18px; font-weight: 600; margin: 0;
+  }
+  .block-head .sub { font-size: 12.5px; color: var(--ink-soft); }
+
+  .mood-scale { display: flex; gap: 8px; margin-bottom: 16px; }
+  .mood-opt {
+    flex: 1; border: 1.5px solid var(--rule); border-radius: 4px;
+    padding: 11px 4px; text-align: center; background: var(--paper-raised);
+    cursor: pointer; font-size: 12.5px; color: var(--ink-soft);
+  }
+  .mood-opt .dot { width: 12px; height: 12px; border-radius: 50%; margin: 0 auto 6px; }
+  .mood-opt.selected { border-color: var(--ink); color: var(--ink); background: #fff; }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .tag-chip {
+    border: 1.5px solid var(--rule); border-radius: 16px; padding: 7px 13px;
+    font-size: 13px; color: var(--ink-soft); background: var(--paper-raised);
+    cursor: pointer;
+  }
+  .tag-chip.selected { border-color: var(--accent); color: var(--accent-ink); background: #fff; }
+
+  .mood-note {
+    width: 100%; background: var(--paper-raised); border: 1px solid var(--rule);
+    border-radius: 3px; padding: 9px 11px; font-size: 14px; font-family: inherit;
+    color: var(--ink); resize: vertical; min-height: 50px; margin-bottom: 12px;
+  }
+  .mood-note:focus { outline: none; border-color: var(--accent); }
+
+  .save-line { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
+  .save-line .saved-flag { font-size: 12.5px; color: var(--good); opacity: 0; transition: opacity 0.2s; }
+  .save-line .saved-flag.show { opacity: 1; }
+  .save-line button {
+    background: var(--ink); color: var(--paper); border: none; border-radius: 3px;
+    padding: 9px 18px; font-size: 13.5px; font-family: inherit; cursor: pointer;
+  }
+  .save-line button:hover { background: var(--accent-ink); }
+  .save-line button:disabled { opacity: 0.4; cursor: default; }
+
+  .history-row {
+    display: grid; grid-template-columns: 70px 14px 1fr; gap: 12px;
+    align-items: start; padding: 10px 0; border-bottom: 1px solid var(--rule); font-size: 13.5px;
+  }
+  .history-row:last-child { border-bottom: none; }
+  .history-date { color: var(--ink-soft); padding-top: 1px; }
+  .history-dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 2px; }
+  .history-body .history-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 3px; }
+  .history-tags span {
+    font-size: 10.5px; color: var(--ink-soft); border: 1px solid var(--rule);
+    border-radius: 10px; padding: 1px 7px;
+  }
+  .history-note { line-height: 1.4; color: var(--ink); }
+  .history-note.empty { color: var(--ink-soft); font-style: italic; }
+
+  .note-banner {
+    font-size: 12px; color: var(--ink-soft); text-align: center;
+    margin-top: 30px; padding-top: 14px; border-top: 1px dashed var(--rule);
+  }
+
+  @media (max-width: 420px) {
+    #root { padding: 20px 12px 40px; }
+    .mood-scale { flex-wrap: wrap; }
+    .mood-opt { flex: 1 1 30%; min-width: 30%; }
+  }
+</style>
+</head>
+<body>
+<div id="signin-gate" style="display:flex; min-height:100vh; align-items:center; justify-content:center; background:var(--paper); font-family:'Segoe UI',sans-serif; flex-direction:column; gap:12px; padding:20px;">
+  <div style="font-family:'Iowan Old Style','Palatino Linotype',Georgia,serif; font-size:28px; color:var(--ink);">HQ</div>
+  <div style="color:var(--ink-soft); font-size:13.5px;" id="signin-mode-label">Sign in to see your synced entries</div>
+  <input id="signin-email" type="email" placeholder="Email" autocomplete="username"
+    style="width:240px; padding:10px 12px; border:1px solid var(--rule); border-radius:4px; font-size:14px; background:var(--paper-raised); color:var(--ink);" />
+  <input id="signin-password" type="password" placeholder="Password" autocomplete="current-password"
+    style="width:240px; padding:10px 12px; border:1px solid var(--rule); border-radius:4px; font-size:14px; background:var(--paper-raised); color:var(--ink);" />
+  <button id="signin-btn" style="width:240px; background:var(--ink); color:var(--paper); border:none; border-radius:4px; padding:11px 0; font-size:14.5px; cursor:pointer;">Sign in</button>
+  <div id="signin-error" style="color:#8B4A3F; font-size:12.5px; min-height:16px;"></div>
+  <button id="signin-toggle" style="background:none; border:none; color:var(--ink-soft); font-size:12px; text-decoration:underline; cursor:pointer;">First time? Create your account</button>
+</div>
+
+<div id="root" style="display:none;">
+  <div id="inner">
+    <div class="masthead">
+      <h1>HQ</h1>
+      <div style="text-align:right;">
+        <div class="today" id="today-label"></div>
+        <button id="signout-btn" style="background:none;border:none;color:var(--ink-soft);font-size:11.5px;text-decoration:underline;cursor:pointer;padding:2px 0;">sign out</button>
+      </div>
+    </div>
+
+    <nav class="tabs">
+      <div class="tab active">Mood</div>
+      <div class="tab soon">Goals <span class="soon-tag">soon</span></div>
+      <div class="tab soon">Journal <span class="soon-tag">soon</span></div>
+      <div class="tab soon">Creativity <span class="soon-tag">soon</span></div>
+    </nav>
+
+    <div class="streak-line" id="streak-line"></div>
+
+    <div class="block">
+      <div class="block-head">
+        <h2>How's today going</h2>
+      </div>
+      <div class="mood-scale" id="mood-scale"></div>
+
+      <div class="block-head" style="margin-top:16px;">
+        <span class="sub">Energy level (optional)</span>
+      </div>
+      <div class="mood-scale" id="energy-scale"></div>
+
+      <div class="block-head">
+        <span class="sub">What's playing into it? (optional, pick any)</span>
+      </div>
+      <div class="tag-row" id="tag-row"></div>
+
+      <textarea class="mood-note" id="mood-note" placeholder="Anything else, optional..."></textarea>
+
+      <div class="save-line">
+        <span class="saved-flag" id="saved-flag">Saved</span>
+        <button id="save-btn" disabled>Add entry</button>
+      </div>
+
+      <div id="today-entries" style="margin-top:18px;"></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><h2>Recent history</h2></div>
+      <div id="history-list"></div>
+    </div>
+
+    <div class="note-banner">
+      This is a working preview with sample data — nothing here saves permanently yet.
+      Once the design feels right, we'll connect it to real synced storage.
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import {
+  getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, Timestamp
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBZ15HhvM6LnYhkSF1T-XXZi1WMkC4OB4A",
+  authDomain: "my-hq-6082b.firebaseapp.com",
+  projectId: "my-hq-6082b",
+  storageBucket: "my-hq-6082b.firebasestorage.app",
+  messagingSenderId: "294542508151",
+  appId: "1:294542508151:web:aa564518efe649d4730672",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const ALLOWED_UID = "uoU0LB6GMTZ4af7NWJIpE8oKsDU2";
+
+(function () {
+  const MOODS = [
+    { key: "rough", label: "Rough", color: "var(--rough)" },
+    { key: "low", label: "Low", color: "var(--low)" },
+    { key: "okay", label: "Okay", color: "var(--okay)" },
+    { key: "good", label: "Good", color: "var(--good)" },
+    { key: "great", label: "Great", color: "var(--great)" },
+  ];
+  const ENERGY = [
+    { key: "drained", label: "Drained", color: "#8B5E6B" },
+    { key: "low", label: "Low", color: "#A98A5C" },
+    { key: "steady", label: "Steady", color: "#A9821F" },
+    { key: "energized", label: "Energized", color: "#5C8A66" },
+    { key: "wired", label: "Wired", color: "#3E6E86" },
+  ];
+  const TAGS = ["Work", "Sleep", "Social", "Health", "Family", "Money", "Weather"];
+
+  function pad(n) { return n < 10 ? "0" + n : "" + n; }
+  function dateKey(d) { return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+  function fmtShort(d) { return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }); }
+  function fmtLong(d) { return d.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" }); }
+
+  const today = new Date();
+  const todayKey = dateKey(today);
+  document.getElementById("today-label").textContent = fmtLong(today);
+
+  function fmtTime(d) { return d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }); }
+
+  // ---- fake seed history (in-memory only, for this preview) ----
+  // history[dateKey] = array of entries, each { id, time, mood, energy, tags, note }
+  const history = {};
+  let currentUser = null;
+  let unsubscribeEntries = null;
+
+  let isCreateMode = false;
+  document.getElementById("signin-password").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("signin-btn").click();
+  });
+  document.getElementById("signin-toggle").addEventListener("click", () => {
+    isCreateMode = !isCreateMode;
+    document.getElementById("signin-mode-label").textContent = isCreateMode
+      ? "Create your account" : "Sign in to see your synced entries";
+    document.getElementById("signin-btn").textContent = isCreateMode ? "Create account" : "Sign in";
+    document.getElementById("signin-toggle").textContent = isCreateMode
+      ? "Already have an account? Sign in" : "First time? Create your account";
+    document.getElementById("signin-error").textContent = "";
+  });
+
+  document.getElementById("signin-btn").addEventListener("click", () => {
+    const email = document.getElementById("signin-email").value.trim();
+    const password = document.getElementById("signin-password").value;
+    const errEl = document.getElementById("signin-error");
+    errEl.textContent = "";
+    if (!email || !password) {
+      errEl.textContent = "Enter both email and password.";
+      return;
+    }
+    const action = isCreateMode
+      ? createUserWithEmailAndPassword(auth, email, password)
+      : signInWithEmailAndPassword(auth, email, password);
+    action.catch(err => {
+      errEl.textContent = err.message.replace("Firebase: ", "").replace(/\s*\(auth\/.*\)\.?/, "");
+    });
+  });
+
+  document.getElementById("signout-btn").addEventListener("click", () => {
+    signOut(auth);
+  });
+
+  onAuthStateChanged(auth, (user) => {
+    if (user && user.uid !== ALLOWED_UID) {
+      signOut(auth);
+      document.getElementById("signin-error").textContent = "This app is private and restricted to its owner.";
+      return;
+    }
+    currentUser = user;
+    if (unsubscribeEntries) { unsubscribeEntries(); unsubscribeEntries = null; }
+    Object.keys(history).forEach(k => delete history[k]);
+
+    if (user) {
+      document.getElementById("signin-gate").style.display = "none";
+      document.getElementById("root").style.display = "flex";
+      const entriesRef = collection(db, "users", user.uid, "entries");
+      const q = query(entriesRef, orderBy("createdAt", "asc"));
+      unsubscribeEntries = onSnapshot(q, (snapshot) => {
+        Object.keys(history).forEach(k => delete history[k]);
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          if (!history[data.dateKey]) history[data.dateKey] = [];
+          history[data.dateKey].push({
+            id: docSnap.id,
+            time: data.time,
+            mood: data.mood,
+            energy: data.energy || null,
+            tags: data.tags || [],
+            note: data.note || "",
+          });
+        });
+        renderStreak();
+        renderTodayEntries();
+        renderHistory();
+      }, (err) => {
+        console.error("Firestore listen failed", err);
+      });
+    } else {
+      document.getElementById("signin-gate").style.display = "flex";
+      document.getElementById("root").style.display = "none";
+    }
+  });
+
+  let selectedMood = null;
+  let selectedEnergy = null;
+  let selectedTags = new Set();
+
+  // ---- mood scale ----
+  const scaleEl = document.getElementById("mood-scale");
+  MOODS.forEach(m => {
+    const opt = document.createElement("div");
+    opt.className = "mood-opt";
+    opt.dataset.key = m.key;
+    opt.innerHTML = `<div class="dot" style="background:${m.color}"></div>${m.label}`;
+    opt.addEventListener("click", () => {
+      selectedMood = m.key;
+      renderScale();
+      updateSaveState();
+    });
+    scaleEl.appendChild(opt);
+  });
+  function renderScale() {
+    document.querySelectorAll("#mood-scale .mood-opt").forEach(el => {
+      el.classList.toggle("selected", el.dataset.key === selectedMood);
+    });
+  }
+
+  // ---- energy scale (optional) ----
+  const energyEl = document.getElementById("energy-scale");
+  ENERGY.forEach(en => {
+    const opt = document.createElement("div");
+    opt.className = "mood-opt";
+    opt.dataset.key = en.key;
+    opt.innerHTML = `<div class="dot" style="background:${en.color}"></div>${en.label}`;
+    opt.addEventListener("click", () => {
+      selectedEnergy = selectedEnergy === en.key ? null : en.key;
+      renderEnergyScale();
+    });
+    energyEl.appendChild(opt);
+  });
+  function renderEnergyScale() {
+    document.querySelectorAll("#energy-scale .mood-opt").forEach(el => {
+      el.classList.toggle("selected", el.dataset.key === selectedEnergy);
+    });
+  }
+
+  // ---- tags ----
+  const tagRow = document.getElementById("tag-row");
+  TAGS.forEach(t => {
+    const chip = document.createElement("div");
+    chip.className = "tag-chip";
+    chip.textContent = t;
+    chip.addEventListener("click", () => {
+      if (selectedTags.has(t)) selectedTags.delete(t); else selectedTags.add(t);
+      chip.classList.toggle("selected");
+    });
+    tagRow.appendChild(chip);
+  });
+
+  function updateSaveState() {
+    document.getElementById("save-btn").disabled = !selectedMood;
+  }
+
+  document.getElementById("save-btn").addEventListener("click", async () => {
+    if (!selectedMood || !currentUser) return;
+    const now = new Date();
+    const entriesRef = collection(db, "users", currentUser.uid, "entries");
+    const btn = document.getElementById("save-btn");
+    btn.disabled = true;
+    try {
+      await addDoc(entriesRef, {
+        dateKey: todayKey,
+        time: fmtTime(now),
+        mood: selectedMood,
+        energy: selectedEnergy,
+        tags: Array.from(selectedTags),
+        note: document.getElementById("mood-note").value.trim(),
+        createdAt: serverTimestamp(),
+      });
+
+      // reset the entry form for the next check-in
+      selectedMood = null;
+      selectedEnergy = null;
+      selectedTags = new Set();
+      document.querySelectorAll(".tag-chip.selected").forEach(el => el.classList.remove("selected"));
+      document.getElementById("mood-note").value = "";
+      renderScale();
+      renderEnergyScale();
+
+      const flag = document.getElementById("saved-flag");
+      flag.classList.add("show");
+      setTimeout(() => flag.classList.remove("show"), 1500);
+      // renderStreak/renderTodayEntries/renderHistory fire automatically via the Firestore listener
+    } catch (err) {
+      alert("Couldn't save: " + err.message);
+    } finally {
+      updateSaveState();
+    }
+  });
+
+  // ---- streak (a day counts if it has at least one entry) ----
+  function renderStreak() {
+    let streak = 0;
+    let cursor = new Date(today);
+    while (true) {
+      const key = dateKey(cursor);
+      if (history[key] && history[key].length > 0) {
+        streak++;
+        cursor.setDate(cursor.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+    const el = document.getElementById("streak-line");
+    if (streak === 0) {
+      el.innerHTML = `No streak yet today — log your mood to start one.`;
+    } else {
+      el.innerHTML = `<span class="streak-num">${streak}</span> day${streak === 1 ? "" : "s"} logged in a row`;
+    }
+  }
+
+  // ---- today's entries so far ----
+  function renderTodayEntries() {
+    const container = document.getElementById("today-entries");
+    const entries = history[todayKey] || [];
+    if (entries.length === 0) {
+      container.innerHTML = "";
+      return;
+    }
+    container.innerHTML = `<div class="sub" style="margin-bottom:8px;">Logged today (${entries.length})</div>` +
+      entries.map(e => {
+        const moodDef = MOODS.find(m => m.key === e.mood);
+        const energyDef = e.energy ? ENERGY.find(en => en.key === e.energy) : null;
+        const label = energyDef ? `${moodDef.label} · ${energyDef.label}` : moodDef.label;
+        const tagsHtml = e.tags && e.tags.length
+          ? `<div class="history-tags">${e.tags.map(t => `<span>${t}</span>`).join("")}</div>` : "";
+        return `<div class="history-row" style="grid-template-columns:60px 14px 1fr;">
+            <div class="history-date">${e.time}</div>
+            <div class="history-dot" style="background:${moodDef.color}"></div>
+            <div class="history-body">${tagsHtml}<div class="history-note${e.note ? "" : " empty"}">${e.note || label}</div></div>
+          </div>`;
+      }).join("");
+  }
+
+  // ---- history list (grouped by day, most recent first) ----
+  function renderHistory() {
+    const container = document.getElementById("history-list");
+    container.innerHTML = "";
+    for (let i = 0; i < 10; i++) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const key = dateKey(d);
+      const entries = history[key] || [];
+
+      const dayWrap = document.createElement("div");
+      dayWrap.style.marginBottom = "14px";
+
+      const dayLabel = document.createElement("div");
+      dayLabel.className = "history-date";
+      dayLabel.style.marginBottom = "4px";
+      dayLabel.textContent = fmtShort(d) + (entries.length > 1 ? ` · ${entries.length} entries` : "");
+      dayWrap.appendChild(dayLabel);
+
+      if (entries.length === 0) {
+        const row = document.createElement("div");
+        row.className = "history-row";
+        row.innerHTML = `<div></div><div class="history-dot" style="border:1.5px solid var(--rule)"></div><div class="history-note empty">no entry</div>`;
+        dayWrap.appendChild(row);
+      } else {
+        entries.forEach(entry => {
+          const moodDef = MOODS.find(m => m.key === entry.mood);
+          const row = document.createElement("div");
+          row.className = "history-row";
+          row.style.gridTemplateColumns = "60px 14px 1fr";
+
+          const timeEl = document.createElement("div");
+          timeEl.className = "history-date";
+          timeEl.textContent = entry.time;
+
+          const dotEl = document.createElement("div");
+          dotEl.className = "history-dot";
+          dotEl.style.background = moodDef.color;
+
+          const bodyEl = document.createElement("div");
+          bodyEl.className = "history-body";
+          const energyDef = entry.energy ? ENERGY.find(en => en.key === entry.energy) : null;
+          const label = energyDef ? `${moodDef.label} · ${energyDef.label}` : moodDef.label;
+          const tagsHtml = entry.tags && entry.tags.length
+            ? `<div class="history-tags">${entry.tags.map(t => `<span>${t}</span>`).join("")}</div>` : "";
+          const noteHtml = entry.note
+            ? `<div class="history-note">${entry.note}</div>`
+            : `<div class="history-note empty">${label}</div>`;
+          bodyEl.innerHTML = tagsHtml + noteHtml;
+
+          row.appendChild(timeEl);
+          row.appendChild(dotEl);
+          row.appendChild(bodyEl);
+          dayWrap.appendChild(row);
+        });
+      }
+      container.appendChild(dayWrap);
+    }
+  }
+
+  renderStreak();
+  renderTodayEntries();
+  renderHistory();
+})();
+</script>
+</body>
+</html>
