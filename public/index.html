@@ -66,6 +66,7 @@
     padding: 8px 2px 11px;
     position: relative;
     color: var(--ink-soft);
+    cursor: pointer;
   }
   nav.tabs .tab.active { color: var(--ink); }
   nav.tabs .tab.active::after {
@@ -150,6 +151,12 @@
     font-size: 12px; color: var(--ink-soft); text-align: center;
     margin-top: 30px; padding-top: 14px; border-top: 1px dashed var(--rule);
   }
+  .entry-delete {
+    background: none; border: none; color: var(--ink-soft); font-size: 11.5px;
+    text-decoration: underline; cursor: pointer; padding: 2px 4px; opacity: 0.6;
+    white-space: nowrap;
+  }
+  .entry-delete:hover { opacity: 1; color: #8B4A3F; }
 
   @media (max-width: 420px) {
     #root { padding: 20px 12px 40px; }
@@ -182,12 +189,14 @@
     </div>
 
     <nav class="tabs">
-      <div class="tab active">Mood</div>
+      <div class="tab active" data-panel="mood">Mood</div>
+      <div class="tab" data-panel="mp">M/P Diary</div>
       <div class="tab soon">Goals <span class="soon-tag">soon</span></div>
       <div class="tab soon">Journal <span class="soon-tag">soon</span></div>
       <div class="tab soon">Creativity <span class="soon-tag">soon</span></div>
     </nav>
 
+    <div class="tab-panel" id="panel-mood">
     <div class="streak-line" id="streak-line"></div>
 
     <div class="block">
@@ -220,10 +229,86 @@
       <div class="block-head"><h2>Recent history</h2></div>
       <div id="history-list"></div>
     </div>
+    </div>
 
-    <div class="note-banner">
-      This is a working preview with sample data — nothing here saves permanently yet.
-      Once the design feels right, we'll connect it to real synced storage.
+    <div class="tab-panel" id="panel-mp" style="display:none;">
+      <div class="block">
+        <div class="block-head">
+          <h2>Log an activity</h2>
+          <span class="sub">Rate how much it took vs. how much you enjoyed it</span>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-bottom:12px;">
+          <div style="flex:1;">
+            <label class="sub" style="display:block; margin-bottom:4px;">Date</label>
+            <input type="date" id="mp-date" style="width:100%; padding:9px 10px; border:1px solid var(--rule); border-radius:3px; background:var(--paper-raised); color:var(--ink); font-family:inherit; font-size:14px;" />
+          </div>
+          <div style="flex:1;">
+            <label class="sub" style="display:block; margin-bottom:4px;">Time</label>
+            <input type="time" id="mp-time" style="width:100%; padding:9px 10px; border:1px solid var(--rule); border-radius:3px; background:var(--paper-raised); color:var(--ink); font-family:inherit; font-size:14px;" />
+          </div>
+        </div>
+
+        <label class="sub" style="display:block; margin-bottom:4px;">Activity</label>
+        <input type="text" id="mp-activity" placeholder="What did you do?" maxlength="140"
+          style="width:100%; padding:9px 11px; border:1px solid var(--rule); border-radius:3px; background:var(--paper-raised); color:var(--ink); font-family:inherit; font-size:14.5px; margin-bottom:16px;" />
+
+        <div style="margin-bottom:16px;">
+          <label class="sub" style="display:flex; justify-content:space-between;">
+            <span>Mastery (sense of accomplishment)</span>
+            <span id="mp-mastery-val" style="color:var(--ink); font-weight:600;">5</span>
+          </label>
+          <input type="range" id="mp-mastery" min="0" max="10" value="5" style="width:100%; accent-color: var(--accent); margin-top:6px;" />
+        </div>
+
+        <div style="margin-bottom:18px;">
+          <label class="sub" style="display:flex; justify-content:space-between;">
+            <span>Pleasure (how much you enjoyed it)</span>
+            <span id="mp-pleasure-val" style="color:var(--ink); font-weight:600;">5</span>
+          </label>
+          <input type="range" id="mp-pleasure" min="0" max="10" value="5" style="width:100%; accent-color: var(--good); margin-top:6px;" />
+        </div>
+
+        <div class="save-line">
+          <span class="saved-flag" id="mp-saved-flag">Saved</span>
+          <button id="mp-save-btn">Add entry</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <button id="mp-import-toggle" style="background:none; border:1px solid var(--rule); border-radius:4px; color:var(--ink-soft); font-size:12.5px; padding:7px 12px; cursor:pointer;">Import from Google Sheets</button>
+        <div id="mp-import-panel" style="display:none; margin-top:12px;">
+          <div class="sub" style="margin-bottom:6px;">
+            In your sheet, select your Date/Day/Time/Activity/Mastery/Pleasure rows (no header row), copy them (Ctrl+C), then paste below.
+          </div>
+          <textarea id="mp-import-text" placeholder="Paste rows here..." style="width:100%; min-height:100px; background:var(--paper-raised); border:1px solid var(--rule); border-radius:3px; padding:9px 11px; font-size:13px; font-family:monospace; color:var(--ink);"></textarea>
+          <div class="save-line" style="margin-top:8px;">
+            <span class="saved-flag" id="mp-import-flag">Imported</span>
+            <button id="mp-import-btn">Import rows</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="block">
+        <div class="block-head"><h2>History</h2></div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; font-size:13px;">
+            <thead>
+              <tr style="border-bottom:1.5px solid var(--ink);">
+                <th style="text-align:left; padding:6px 8px; font-weight:600;">Date</th>
+                <th style="text-align:left; padding:6px 8px; font-weight:600;">Day</th>
+                <th style="text-align:left; padding:6px 8px; font-weight:600;">Time</th>
+                <th style="text-align:left; padding:6px 8px; font-weight:600;">Activity</th>
+                <th style="text-align:center; padding:6px 8px; font-weight:600;">Mastery</th>
+                <th style="text-align:center; padding:6px 8px; font-weight:600;">Pleasure</th>
+                <th style="padding:6px 8px;"></th>
+              </tr>
+            </thead>
+            <tbody id="mp-table-body"></tbody>
+          </table>
+          <div id="mp-empty" class="empty-note" style="display:none;">No entries yet.</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -234,7 +319,7 @@ import {
   getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import {
-  getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, Timestamp
+  getFirestore, collection, addDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp, Timestamp, writeBatch, doc
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -277,13 +362,15 @@ const ALLOWED_UID = "uoU0LB6GMTZ4af7NWJIpE8oKsDU2";
   const todayKey = dateKey(today);
   document.getElementById("today-label").textContent = fmtLong(today);
 
-  function fmtTime(d) { return d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }); }
+  function fmtTime(d) { return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", hour12: false }); }
 
   // ---- fake seed history (in-memory only, for this preview) ----
   // history[dateKey] = array of entries, each { id, time, mood, energy, tags, note }
   const history = {};
   let currentUser = null;
   let unsubscribeEntries = null;
+  let mpEntries = [];
+  let unsubscribeMP = null;
 
   let isCreateMode = false;
   document.getElementById("signin-password").addEventListener("keydown", (e) => {
@@ -328,7 +415,9 @@ const ALLOWED_UID = "uoU0LB6GMTZ4af7NWJIpE8oKsDU2";
     }
     currentUser = user;
     if (unsubscribeEntries) { unsubscribeEntries(); unsubscribeEntries = null; }
+    if (unsubscribeMP) { unsubscribeMP(); unsubscribeMP = null; }
     Object.keys(history).forEach(k => delete history[k]);
+    mpEntries = [];
 
     if (user) {
       document.getElementById("signin-gate").style.display = "none";
@@ -355,10 +444,51 @@ const ALLOWED_UID = "uoU0LB6GMTZ4af7NWJIpE8oKsDU2";
       }, (err) => {
         console.error("Firestore listen failed", err);
       });
+
+      const mpRef = collection(db, "users", user.uid, "mpEntries");
+      const mpQ = query(mpRef, orderBy("dateKey", "desc"), orderBy("time", "desc"));
+      unsubscribeMP = onSnapshot(mpQ, (snapshot) => {
+        mpEntries = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderMPTable();
+      }, (err) => {
+        console.error("MP Firestore listen failed", err);
+      });
     } else {
       document.getElementById("signin-gate").style.display = "flex";
       document.getElementById("root").style.display = "none";
     }
+  });
+
+  async function deleteMoodEntry(id) {
+    if (!currentUser || !id) return;
+    if (!confirm("Delete this entry? This can't be undone.")) return;
+    try {
+      await deleteDoc(doc(db, "users", currentUser.uid, "entries", id));
+    } catch (err) {
+      alert("Couldn't delete: " + err.message);
+    }
+  }
+  async function deleteMPEntry(id) {
+    if (!currentUser || !id) return;
+    if (!confirm("Delete this entry? This can't be undone.")) return;
+    try {
+      await deleteDoc(doc(db, "users", currentUser.uid, "mpEntries", id));
+    } catch (err) {
+      alert("Couldn't delete: " + err.message);
+    }
+  }
+  // event delegation so re-rendered rows keep working without re-attaching listeners
+  document.getElementById("today-entries").addEventListener("click", (e) => {
+    const btn = e.target.closest(".entry-delete");
+    if (btn) deleteMoodEntry(btn.dataset.id);
+  });
+  document.getElementById("history-list").addEventListener("click", (e) => {
+    const btn = e.target.closest(".entry-delete");
+    if (btn) deleteMoodEntry(btn.dataset.id);
+  });
+  document.getElementById("mp-table-body").addEventListener("click", (e) => {
+    const btn = e.target.closest(".entry-delete");
+    if (btn) deleteMPEntry(btn.dataset.id);
   });
 
   let selectedMood = null;
@@ -494,10 +624,11 @@ const ALLOWED_UID = "uoU0LB6GMTZ4af7NWJIpE8oKsDU2";
         const label = energyDef ? `${moodDef.label} · ${energyDef.label}` : moodDef.label;
         const tagsHtml = e.tags && e.tags.length
           ? `<div class="history-tags">${e.tags.map(t => `<span>${t}</span>`).join("")}</div>` : "";
-        return `<div class="history-row" style="grid-template-columns:60px 14px 1fr;">
+        return `<div class="history-row" style="grid-template-columns:60px 14px 1fr auto;">
             <div class="history-date">${e.time}</div>
             <div class="history-dot" style="background:${moodDef.color}"></div>
             <div class="history-body">${tagsHtml}<div class="history-note${e.note ? "" : " empty"}">${e.note || label}</div></div>
+            <button class="entry-delete" data-id="${e.id}">delete</button>
           </div>`;
       }).join("");
   }
@@ -552,9 +683,16 @@ const ALLOWED_UID = "uoU0LB6GMTZ4af7NWJIpE8oKsDU2";
             : `<div class="history-note empty">${label}</div>`;
           bodyEl.innerHTML = tagsHtml + noteHtml;
 
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "entry-delete";
+          deleteBtn.dataset.id = entry.id;
+          deleteBtn.textContent = "delete";
+
+          row.style.gridTemplateColumns = "60px 14px 1fr auto";
           row.appendChild(timeEl);
           row.appendChild(dotEl);
           row.appendChild(bodyEl);
+          row.appendChild(deleteBtn);
           dayWrap.appendChild(row);
         });
       }
@@ -565,6 +703,188 @@ const ALLOWED_UID = "uoU0LB6GMTZ4af7NWJIpE8oKsDU2";
   renderStreak();
   renderTodayEntries();
   renderHistory();
+
+  // ---- tab switching ----
+  document.querySelectorAll("nav.tabs .tab[data-panel]").forEach(tabEl => {
+    tabEl.addEventListener("click", () => {
+      document.querySelectorAll("nav.tabs .tab[data-panel]").forEach(t => t.classList.remove("active"));
+      tabEl.classList.add("active");
+      document.querySelectorAll(".tab-panel").forEach(p => p.style.display = "none");
+      document.getElementById("panel-" + tabEl.dataset.panel).style.display = "block";
+    });
+  });
+
+  // ================= M/P Diary =================
+  const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  function dayNameFromKey(key) {
+    const [y, m, d] = key.split("-").map(Number);
+    return DAY_NAMES[new Date(y, m - 1, d).getDay()];
+  }
+  function nowTimeStr(d) { return `${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+  function fmtTimeDisplay(timeStr) {
+    if (!timeStr) return "";
+    const [h, m] = timeStr.split(":").map(Number);
+    const d = new Date(); d.setHours(h, m, 0, 0);
+    return fmtTime(d);
+  }
+
+  const mpDateInput = document.getElementById("mp-date");
+  const mpTimeInput = document.getElementById("mp-time");
+  mpDateInput.value = todayKey;
+  mpTimeInput.value = nowTimeStr(new Date());
+
+  const mpMasterySlider = document.getElementById("mp-mastery");
+  const mpPleasureSlider = document.getElementById("mp-pleasure");
+  mpMasterySlider.addEventListener("input", () => {
+    document.getElementById("mp-mastery-val").textContent = mpMasterySlider.value;
+  });
+  mpPleasureSlider.addEventListener("input", () => {
+    document.getElementById("mp-pleasure-val").textContent = mpPleasureSlider.value;
+  });
+
+  document.getElementById("mp-save-btn").addEventListener("click", async () => {
+    if (!currentUser) return;
+    const activity = document.getElementById("mp-activity").value.trim();
+    if (!activity) { alert("Add a short description of the activity."); return; }
+    const dateVal = mpDateInput.value || todayKey;
+    const timeVal = mpTimeInput.value || nowTimeStr(new Date());
+    const btn = document.getElementById("mp-save-btn");
+    btn.disabled = true;
+    try {
+      await addDoc(collection(db, "users", currentUser.uid, "mpEntries"), {
+        dateKey: dateVal,
+        day: dayNameFromKey(dateVal),
+        time: timeVal,
+        activity: activity,
+        mastery: Number(mpMasterySlider.value),
+        pleasure: Number(mpPleasureSlider.value),
+        createdAt: serverTimestamp(),
+      });
+      document.getElementById("mp-activity").value = "";
+      mpMasterySlider.value = 5; mpPleasureSlider.value = 5;
+      document.getElementById("mp-mastery-val").textContent = "5";
+      document.getElementById("mp-pleasure-val").textContent = "5";
+      mpDateInput.value = todayKey;
+      mpTimeInput.value = nowTimeStr(new Date());
+      const flag = document.getElementById("mp-saved-flag");
+      flag.classList.add("show");
+      setTimeout(() => flag.classList.remove("show"), 1500);
+    } catch (err) {
+      alert("Couldn't save: " + err.message);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  function renderMPTable() {
+    const tbody = document.getElementById("mp-table-body");
+    const emptyEl = document.getElementById("mp-empty");
+    tbody.innerHTML = "";
+    if (mpEntries.length === 0) {
+      emptyEl.style.display = "block";
+      return;
+    }
+    emptyEl.style.display = "none";
+    mpEntries.forEach(e => {
+      const tr = document.createElement("tr");
+      tr.style.borderBottom = "1px solid var(--rule)";
+      tr.innerHTML = `
+        <td style="padding:7px 8px; color:var(--ink-soft);">${e.dateKey}</td>
+        <td style="padding:7px 8px; color:var(--ink-soft);">${e.day || dayNameFromKey(e.dateKey)}</td>
+        <td style="padding:7px 8px; color:var(--ink-soft);">${fmtTimeDisplay(e.time)}</td>
+        <td style="padding:7px 8px;">${e.activity}</td>
+        <td style="padding:7px 8px; text-align:center; font-weight:600;">${e.mastery}</td>
+        <td style="padding:7px 8px; text-align:center; font-weight:600; color:var(--good);">${e.pleasure}</td>
+        <td style="padding:7px 8px;"><button class="entry-delete" data-id="${e.id}">delete</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ---- import from pasted spreadsheet rows ----
+  document.getElementById("mp-import-toggle").addEventListener("click", () => {
+    const panel = document.getElementById("mp-import-panel");
+    panel.style.display = panel.style.display === "none" ? "block" : "none";
+  });
+
+  function parseImportDate(raw) {
+    raw = raw.trim();
+    // Accept YYYY-MM-DD directly
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+    // Accept things like 9/5/2026 or 09/05/2026
+    const m = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (m) return `${m[3]}-${pad(Number(m[1]))}-${pad(Number(m[2]))}`;
+    return null;
+  }
+  function parseImportTime(raw) {
+    raw = raw.trim();
+    if (/^\d{1,2}:\d{2}$/.test(raw)) {
+      const [h, m] = raw.split(":");
+      return `${pad(Number(h))}:${pad(Number(m))}`;
+    }
+    // Accept "7:30 AM" style
+    const m = raw.match(/^(\d{1,2}):(\d{2})\s*([AaPp][Mm])$/);
+    if (m) {
+      let h = Number(m[1]) % 12;
+      if (/pm/i.test(m[3])) h += 12;
+      return `${pad(h)}:${pad(Number(m[2]))}`;
+    }
+    return "12:00";
+  }
+
+  document.getElementById("mp-import-btn").addEventListener("click", async () => {
+    if (!currentUser) return;
+    const raw = document.getElementById("mp-import-text").value;
+    const lines = raw.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+    if (lines.length === 0) return;
+
+    const rows = [];
+    const errors = [];
+    lines.forEach((line, i) => {
+      const cols = line.split("\t");
+      if (cols.length < 6) { errors.push(`Line ${i + 1}: expected 6 tab-separated columns, got ${cols.length}`); return; }
+      const [rawDate, , rawTime, activity, rawMastery, rawPleasure] = cols; // skip Day column, we recompute it
+      const dateKey_ = parseImportDate(rawDate);
+      if (!dateKey_) { errors.push(`Line ${i + 1}: couldn't read date "${rawDate}"`); return; }
+      const mastery = Number(rawMastery);
+      const pleasure = Number(rawPleasure);
+      if (Number.isNaN(mastery) || Number.isNaN(pleasure)) { errors.push(`Line ${i + 1}: mastery/pleasure not numbers`); return; }
+      rows.push({
+        dateKey: dateKey_,
+        day: dayNameFromKey(dateKey_),
+        time: parseImportTime(rawTime),
+        activity: activity.trim(),
+        mastery, pleasure,
+      });
+    });
+
+    if (errors.length > 0) {
+      alert("Some rows couldn't be read:\n" + errors.slice(0, 5).join("\n") + (errors.length > 5 ? `\n...and ${errors.length - 5} more` : ""));
+      if (rows.length === 0) return;
+    }
+
+    const btn = document.getElementById("mp-import-btn");
+    btn.disabled = true;
+    try {
+      // Firestore batches cap at 500 writes; chunk just in case
+      for (let i = 0; i < rows.length; i += 400) {
+        const batch = writeBatch(db);
+        rows.slice(i, i + 400).forEach(r => {
+          const ref = doc(collection(db, "users", currentUser.uid, "mpEntries"));
+          batch.set(ref, { ...r, createdAt: serverTimestamp() });
+        });
+        await batch.commit();
+      }
+      document.getElementById("mp-import-text").value = "";
+      const flag = document.getElementById("mp-import-flag");
+      flag.classList.add("show");
+      setTimeout(() => flag.classList.remove("show"), 2000);
+    } catch (err) {
+      alert("Import failed: " + err.message);
+    } finally {
+      btn.disabled = false;
+    }
+  });
 })();
 </script>
 </body>
