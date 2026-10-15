@@ -158,6 +158,28 @@
   }
   .entry-delete:hover { opacity: 1; color: #8B4A3F; }
 
+  .todo-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 2px; border-bottom: 1px solid var(--rule);
+  }
+  .todo-row:last-child { border-bottom: none; }
+  .todo-check {
+    width: 20px; height: 20px; border: 1.5px solid var(--ink-soft); border-radius: 50%;
+    flex: 0 0 auto; margin-top: 2px; cursor: pointer; background: transparent; padding: 0;
+  }
+  .todo-check.done { background: var(--good); border-color: var(--good); }
+  .todo-priority-bar {
+    width: 4px; border-radius: 2px; flex: 0 0 auto; align-self: stretch; min-height: 20px;
+  }
+  .todo-main { flex: 1; min-width: 0; }
+  .todo-title { font-size: 14.5px; line-height: 1.4; color: var(--ink); }
+  .todo-meta { display: flex; gap: 8px; margin-top: 3px; flex-wrap: wrap; align-items: center; }
+  .todo-due { font-size: 11.5px; padding: 1px 7px; border-radius: 10px; border: 1px solid var(--rule); color: var(--ink-soft); }
+  .todo-due.overdue { color: #8B4A3F; border-color: #8B4A3F; }
+  .todo-due.today { color: var(--accent-ink); border-color: var(--accent); }
+  .todo-recur { font-size: 11px; color: var(--ink-soft); }
+  .todo-empty-section { font-size: 12.5px; color: var(--ink-soft); font-style: italic; padding: 4px 2px; }
+
   @media (max-width: 420px) {
     #root { padding: 20px 12px 40px; }
     .mood-scale { flex-wrap: wrap; }
@@ -191,7 +213,7 @@
     <nav class="tabs">
       <div class="tab active" data-panel="mood">Mood</div>
       <div class="tab" data-panel="mp">M/P Diary</div>
-      <div class="tab soon">Goals <span class="soon-tag">soon</span></div>
+      <div class="tab" data-panel="todo">To-Do</div>
       <div class="tab soon">Journal <span class="soon-tag">soon</span></div>
       <div class="tab soon">Creativity <span class="soon-tag">soon</span></div>
     </nav>
@@ -310,6 +332,65 @@
         </div>
       </div>
     </div>
+
+    <div class="tab-panel" id="panel-todo" style="display:none;">
+      <div class="block">
+        <div class="block-head">
+          <h2>Add a task</h2>
+          <span class="sub">Try typing naturally, e.g. "Call dentist tomorrow 2pm p2 weekly"</span>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="todo-quickadd" placeholder="What needs doing?" maxlength="160"
+            style="flex:1; padding:10px 12px; border:1px solid var(--rule); border-radius:3px; background:var(--paper-raised); color:var(--ink); font-family:inherit; font-size:14.5px;" />
+          <button id="todo-add-btn" style="background:var(--ink); color:var(--paper); border:none; border-radius:3px; padding:0 18px; font-size:14px; cursor:pointer;">Add</button>
+        </div>
+        <div id="todo-parse-preview" class="sub" style="margin-top:8px; min-height:16px;"></div>
+
+        <button id="todo-more-toggle" style="margin-top:10px; background:none; border:none; color:var(--ink-soft); font-size:12px; text-decoration:underline; cursor:pointer; padding:0;">Adjust date, time, priority, repeat</button>
+        <div id="todo-more-panel" style="display:none; margin-top:12px; gap:10px; flex-wrap:wrap;">
+          <div>
+            <label class="sub" style="display:block; margin-bottom:4px;">Date</label>
+            <input type="date" id="todo-date" style="padding:8px 9px; border:1px solid var(--rule); border-radius:3px; background:var(--paper-raised); color:var(--ink); font-family:inherit; font-size:13.5px;" />
+          </div>
+          <div>
+            <label class="sub" style="display:block; margin-bottom:4px;">Time</label>
+            <input type="time" id="todo-time" style="padding:8px 9px; border:1px solid var(--rule); border-radius:3px; background:var(--paper-raised); color:var(--ink); font-family:inherit; font-size:13.5px;" />
+          </div>
+          <div>
+            <label class="sub" style="display:block; margin-bottom:4px;">Priority</label>
+            <select id="todo-priority" style="padding:8px 9px; border:1px solid var(--rule); border-radius:3px; background:var(--paper-raised); color:var(--ink); font-family:inherit; font-size:13.5px;">
+              <option value="4">p4 — none</option>
+              <option value="3">p3 — low</option>
+              <option value="2">p2 — medium</option>
+              <option value="1">p1 — urgent</option>
+            </select>
+          </div>
+          <div>
+            <label class="sub" style="display:block; margin-bottom:4px;">Repeat</label>
+            <select id="todo-recurrence" style="padding:8px 9px; border:1px solid var(--rule); border-radius:3px; background:var(--paper-raised); color:var(--ink); font-family:inherit; font-size:13.5px;">
+              <option value="none">Doesn't repeat</option>
+              <option value="daily">Every day</option>
+              <option value="weekly">Every week</option>
+              <option value="monthly">Every month</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="block" id="todo-section-overdue" style="display:none;">
+        <div class="block-head"><h2 style="color:#8B4A3F;">Overdue</h2></div>
+        <div id="todo-list-overdue"></div>
+      </div>
+      <div class="block">
+        <div class="block-head"><h2>Today</h2></div>
+        <div id="todo-list-today"></div>
+      </div>
+      <div class="block">
+        <div class="block-head"><h2>Upcoming</h2></div>
+        <div id="todo-list-upcoming"></div>
+      </div>
+      <div id="todo-empty" class="empty-note" style="display:none;">No tasks yet — add one above.</div>
+    </div>
   </div>
 </div>
 
@@ -319,7 +400,7 @@ import {
   getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import {
-  getFirestore, collection, addDoc, deleteDoc, query, orderBy, onSnapshot, serverTimestamp, Timestamp, writeBatch, doc
+  getFirestore, collection, addDoc, deleteDoc, updateDoc, query, orderBy, onSnapshot, serverTimestamp, Timestamp, writeBatch, doc
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -371,6 +452,8 @@ const ALLOWED_UID = "uoU0LB6GMTZ4af7NWJIpE8oKsDU2";
   let unsubscribeEntries = null;
   let mpEntries = [];
   let unsubscribeMP = null;
+  let todos = [];
+  let unsubscribeTodos = null;
 
   let isCreateMode = false;
   document.getElementById("signin-password").addEventListener("keydown", (e) => {
@@ -416,8 +499,10 @@ const ALLOWED_UID = "uoU0LB6GMTZ4af7NWJIpE8oKsDU2";
     currentUser = user;
     if (unsubscribeEntries) { unsubscribeEntries(); unsubscribeEntries = null; }
     if (unsubscribeMP) { unsubscribeMP(); unsubscribeMP = null; }
+    if (unsubscribeTodos) { unsubscribeTodos(); unsubscribeTodos = null; }
     Object.keys(history).forEach(k => delete history[k]);
     mpEntries = [];
+    todos = [];
 
     if (user) {
       document.getElementById("signin-gate").style.display = "none";
@@ -452,6 +537,15 @@ const ALLOWED_UID = "uoU0LB6GMTZ4af7NWJIpE8oKsDU2";
         renderMPTable();
       }, (err) => {
         console.error("MP Firestore listen failed", err);
+      });
+
+      const todosRef = collection(db, "users", user.uid, "todos");
+      const todosQ = query(todosRef, orderBy("dueDate", "asc"), orderBy("dueTime", "asc"));
+      unsubscribeTodos = onSnapshot(todosQ, (snapshot) => {
+        todos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderTodos();
+      }, (err) => {
+        console.error("Todos Firestore listen failed", err);
       });
     } else {
       document.getElementById("signin-gate").style.display = "flex";
@@ -885,6 +979,236 @@ const ALLOWED_UID = "uoU0LB6GMTZ4af7NWJIpE8oKsDU2";
       btn.disabled = false;
     }
   });
+
+  // ================= To-Do =================
+  const PRIORITY_COLORS = { 1: "#8B4A3F", 2: "var(--accent)", 3: "var(--low)", 4: "var(--rule)" };
+  const WEEKDAY_NAMES = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+
+  function addDays(dateKeyStr, n) {
+    const [y, m, d] = dateKeyStr.split("-").map(Number);
+    const dt = new Date(y, m - 1, d);
+    dt.setDate(dt.getDate() + n);
+    return dateKey(dt);
+  }
+  function addMonths(dateKeyStr, n) {
+    const [y, m, d] = dateKeyStr.split("-").map(Number);
+    const dt = new Date(y, m - 1, d);
+    dt.setMonth(dt.getMonth() + n);
+    return dateKey(dt);
+  }
+
+  // lightweight natural-language parser: pulls date/time/priority/recurrence
+  // tokens out of free text and returns the cleaned title plus the parsed fields.
+  function parseQuickAdd(raw) {
+    let text = " " + raw.trim() + " ";
+    const result = {
+      dateKey: todayKey,
+      time: null,
+      priority: 4,
+      recurrence: "none",
+    };
+
+    // recurrence
+    if (/\b(every day|daily)\b/i.test(text)) { result.recurrence = "daily"; text = text.replace(/\b(every day|daily)\b/i, " "); }
+    else if (/\b(every week|weekly)\b/i.test(text)) { result.recurrence = "weekly"; text = text.replace(/\b(every week|weekly)\b/i, " "); }
+    else if (/\b(every month|monthly)\b/i.test(text)) { result.recurrence = "monthly"; text = text.replace(/\b(every month|monthly)\b/i, " "); }
+
+    // priority: p1-p4
+    const pMatch = text.match(/\bp([1-4])\b/i);
+    if (pMatch) { result.priority = Number(pMatch[1]); text = text.replace(pMatch[0], " "); }
+
+    // time: "3pm", "3:30pm", "15:00", "at 9"
+    // scan ALL number-ish candidates and use the first one that actually looks like
+    // a time (has a colon or am/pm) — a bare digit elsewhere in the text (like in
+    // "test 1" or "in 3 days") must not stop the search early.
+    const timeCandidates = [...text.matchAll(/\b(?:at\s+)?(\d{1,2})(:(\d{2}))?\s*(am|pm)?\b/gi)];
+    const timeMatch = timeCandidates.find(m => m[4] || m[2]);
+    if (timeMatch) {
+      let h = Number(timeMatch[1]);
+      const min = timeMatch[3] ? Number(timeMatch[3]) : 0;
+      if (timeMatch[4]) {
+        if (/pm/i.test(timeMatch[4]) && h < 12) h += 12;
+        if (/am/i.test(timeMatch[4]) && h === 12) h = 0;
+      }
+      if (h <= 23 && min <= 59) {
+        result.time = `${pad(h)}:${pad(min)}`;
+        text = text.replace(timeMatch[0], " ");
+      }
+    }
+
+    // date: today / tomorrow / weekday name / "in N days"
+    if (/\btoday\b/i.test(text)) { result.dateKey = todayKey; text = text.replace(/\btoday\b/i, " "); }
+    else if (/\btomorrow\b/i.test(text)) { result.dateKey = addDays(todayKey, 1); text = text.replace(/\btomorrow\b/i, " "); }
+    else {
+      const inDaysMatch = text.match(/\bin (\d+) days?\b/i);
+      if (inDaysMatch) {
+        result.dateKey = addDays(todayKey, Number(inDaysMatch[1]));
+        text = text.replace(inDaysMatch[0], " ");
+      } else {
+        const wdMatch = text.match(/\b(next\s+)?(sunday|monday|tuesday|wednesday|thursday|friday|saturday)\b/i);
+        if (wdMatch) {
+          const targetIdx = WEEKDAY_NAMES.indexOf(wdMatch[2].toLowerCase());
+          const [ty, tm, td] = todayKey.split("-").map(Number);
+          const todayIdx = new Date(ty, tm - 1, td).getDay();
+          let diff = (targetIdx - todayIdx + 7) % 7;
+          if (diff === 0 || wdMatch[1]) diff += (diff === 0 ? 7 : 0); // "next" or same-day-name pushes to next week
+          result.dateKey = addDays(todayKey, diff);
+          text = text.replace(wdMatch[0], " ");
+        }
+      }
+    }
+
+    result.title = text.replace(/\s+/g, " ").trim();
+    return result;
+  }
+
+  function updateParsePreview() {
+    const raw = document.getElementById("todo-quickadd").value;
+    const previewEl = document.getElementById("todo-parse-preview");
+    if (!raw.trim()) { previewEl.textContent = ""; return; }
+    const parsed = parseQuickAdd(raw);
+    const parts = [];
+    parts.push(parsed.dateKey === todayKey ? "Today" : fmtShort(new Date(...parsed.dateKey.split("-").map((v,i)=>i===1?v-1:Number(v)))));
+    if (parsed.time) parts.push(parsed.time);
+    if (parsed.priority < 4) parts.push("p" + parsed.priority);
+    if (parsed.recurrence !== "none") parts.push(parsed.recurrence);
+    previewEl.textContent = `→ "${parsed.title || "(untitled)"}" · ${parts.join(" · ")}`;
+
+    // keep the manual fields in sync so "Adjust..." always shows the current parse
+    document.getElementById("todo-date").value = parsed.dateKey;
+    document.getElementById("todo-time").value = parsed.time || "09:00";
+    document.getElementById("todo-priority").value = String(parsed.priority);
+    document.getElementById("todo-recurrence").value = parsed.recurrence;
+  }
+  document.getElementById("todo-quickadd").addEventListener("input", updateParsePreview);
+  document.getElementById("todo-quickadd").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("todo-add-btn").click();
+  });
+
+  document.getElementById("todo-more-toggle").addEventListener("click", () => {
+    const panel = document.getElementById("todo-more-panel");
+    panel.style.display = panel.style.display === "none" ? "flex" : "none";
+  });
+
+  document.getElementById("todo-add-btn").addEventListener("click", async () => {
+    if (!currentUser) return;
+    const rawInput = document.getElementById("todo-quickadd");
+    const raw = rawInput.value.trim();
+    if (!raw) return;
+    const parsed = parseQuickAdd(raw);
+    // manual fields (visible or not) always reflect the latest state and win if the
+    // person tweaked them after the auto-parse, so read from them at submit time
+    const finalDate = document.getElementById("todo-date").value || parsed.dateKey;
+    const finalTime = document.getElementById("todo-time").value || parsed.time || "09:00";
+    const finalPriority = Number(document.getElementById("todo-priority").value || parsed.priority);
+    const finalRecurrence = document.getElementById("todo-recurrence").value || parsed.recurrence;
+    const title = parsed.title || raw;
+
+    const btn = document.getElementById("todo-add-btn");
+    btn.disabled = true;
+    try {
+      await addDoc(collection(db, "users", currentUser.uid, "todos"), {
+        title,
+        dueDate: finalDate,
+        dueTime: finalTime,
+        priority: finalPriority,
+        recurrence: finalRecurrence,
+        completed: false,
+        createdAt: serverTimestamp(),
+      });
+      rawInput.value = "";
+      document.getElementById("todo-parse-preview").textContent = "";
+      document.getElementById("todo-more-panel").style.display = "none";
+    } catch (err) {
+      alert("Couldn't add task: " + err.message);
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  async function toggleTodoComplete(todo) {
+    if (!currentUser) return;
+    const ref = doc(db, "users", currentUser.uid, "todos", todo.id);
+    try {
+      if (todo.recurrence && todo.recurrence !== "none") {
+        // recurring: roll the due date forward instead of marking it done forever
+        let nextDate = todo.dueDate;
+        if (todo.recurrence === "daily") nextDate = addDays(todo.dueDate, 1);
+        else if (todo.recurrence === "weekly") nextDate = addDays(todo.dueDate, 7);
+        else if (todo.recurrence === "monthly") nextDate = addMonths(todo.dueDate, 1);
+        await updateDoc(ref, { dueDate: nextDate });
+      } else {
+        await updateDoc(ref, { completed: !todo.completed });
+      }
+    } catch (err) {
+      alert("Couldn't update: " + err.message);
+    }
+  }
+  async function deleteTodo(id) {
+    if (!currentUser || !id) return;
+    if (!confirm("Delete this task? This can't be undone.")) return;
+    try {
+      await deleteDoc(doc(db, "users", currentUser.uid, "todos", id));
+    } catch (err) {
+      alert("Couldn't delete: " + err.message);
+    }
+  }
+
+  function todoDueLabel(t) {
+    const cls = t.dueDate < todayKey ? "overdue" : (t.dueDate === todayKey ? "today" : "");
+    const dateLabel = t.dueDate === todayKey ? "Today" : fmtShort(new Date(...t.dueDate.split("-").map((v,i)=>i===1?v-1:Number(v))));
+    return `<span class="todo-due ${cls}">${dateLabel} ${fmtTimeDisplay(t.dueTime)}</span>`;
+  }
+
+  function renderTodoRow(t) {
+    const recurLabel = t.recurrence && t.recurrence !== "none" ? `<span class="todo-recur">↻ ${t.recurrence}</span>` : "";
+    return `<div class="todo-row">
+      <div class="todo-priority-bar" style="background:${PRIORITY_COLORS[t.priority] || PRIORITY_COLORS[4]};"></div>
+      <button class="todo-check${t.completed ? " done" : ""}" data-action="toggle" data-id="${t.id}"></button>
+      <div class="todo-main">
+        <div class="todo-title" style="${t.completed ? "text-decoration:line-through; color:var(--ink-soft);" : ""}">${t.title}</div>
+        <div class="todo-meta">${todoDueLabel(t)}${recurLabel}</div>
+      </div>
+      <button class="entry-delete" data-action="delete" data-id="${t.id}">delete</button>
+    </div>`;
+  }
+
+  function renderTodos() {
+    const overdueEl = document.getElementById("todo-list-overdue");
+    const todayEl = document.getElementById("todo-list-today");
+    const upcomingEl = document.getElementById("todo-list-upcoming");
+    const overdueSection = document.getElementById("todo-section-overdue");
+    const emptyEl = document.getElementById("todo-empty");
+
+    const active = todos.filter(t => !t.completed);
+    if (active.length === 0 && todos.length === 0) {
+      emptyEl.style.display = "block";
+    } else {
+      emptyEl.style.display = "none";
+    }
+
+    const overdue = active.filter(t => t.dueDate < todayKey);
+    const today_ = active.filter(t => t.dueDate === todayKey);
+    const upcoming = active.filter(t => t.dueDate > todayKey);
+
+    overdueSection.style.display = overdue.length > 0 ? "block" : "none";
+    overdueEl.innerHTML = overdue.map(renderTodoRow).join("");
+    todayEl.innerHTML = today_.length > 0 ? today_.map(renderTodoRow).join("") : `<div class="todo-empty-section">Nothing due today.</div>`;
+    upcomingEl.innerHTML = upcoming.length > 0 ? upcoming.map(renderTodoRow).join("") : `<div class="todo-empty-section">Nothing upcoming.</div>`;
+  }
+
+  function handleTodoListClick(e) {
+    const btn = e.target.closest("button[data-action]");
+    if (!btn) return;
+    const id = btn.dataset.id;
+    const todo = todos.find(t => t.id === id);
+    if (!todo) return;
+    if (btn.dataset.action === "toggle") toggleTodoComplete(todo);
+    else if (btn.dataset.action === "delete") deleteTodo(id);
+  }
+  document.getElementById("todo-list-overdue").addEventListener("click", handleTodoListClick);
+  document.getElementById("todo-list-today").addEventListener("click", handleTodoListClick);
+  document.getElementById("todo-list-upcoming").addEventListener("click", handleTodoListClick);
 })();
 </script>
 </body>
