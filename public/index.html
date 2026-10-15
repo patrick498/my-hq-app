@@ -1,1215 +1,2229 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<link rel="manifest" href="manifest.json" />
-<link rel="icon" href="icon.svg" type="image/svg+xml" />
-<link rel="apple-touch-icon" href="icon.svg" />
-<meta name="theme-color" content="#223027" />
-<meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="HQ" />
-<title>HQ — Mood</title>
-<style>
-  :root {
-    --paper: #E9ECE4;
-    --paper-raised: #F1F3EC;
-    --ink: #223027;
-    --ink-soft: #5B6B5E;
-    --rule: #C7CCBC;
-    --accent: #A9821F;
-    --accent-ink: #5C4712;
-    --rough: #8B5E6B;
-    --low: #7C8B99;
-    --okay: #A9821F;
-    --good: #5C8A66;
-    --great: #2F6558;
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; }
-  #root {
-    background: var(--paper);
-    color: var(--ink);
-    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-    min-height: 100vh;
-    padding: 28px 18px 50px;
-    display: flex;
-    justify-content: center;
-  }
-  #inner { width: 100%; max-width: 600px; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icon.svg" />
+    <meta name="theme-color" content="#223027" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="HQ" />
+    <title>HQ — Mood</title>
+    <style>
+      :root {
+        --paper: #e9ece4;
+        --paper-raised: #f1f3ec;
+        --ink: #223027;
+        --ink-soft: #5b6b5e;
+        --rule: #c7ccbc;
+        --accent: #a9821f;
+        --accent-ink: #5c4712;
+        --rough: #8b5e6b;
+        --low: #7c8b99;
+        --okay: #a9821f;
+        --good: #5c8a66;
+        --great: #2f6558;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+      }
+      #root {
+        background: var(--paper);
+        color: var(--ink);
+        font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        min-height: 100vh;
+        padding: 28px 18px 50px;
+        display: flex;
+        justify-content: center;
+      }
+      #inner {
+        width: 100%;
+        max-width: 600px;
+      }
 
-  .masthead {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    border-bottom: 2px solid var(--ink);
-    padding-bottom: 12px;
-  }
-  .masthead h1 {
-    font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-    font-weight: 600;
-    font-size: 27px;
-    margin: 0;
-  }
-  .masthead .today { font-size: 12.5px; color: var(--ink-soft); text-align: right; }
+      .masthead {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        border-bottom: 2px solid var(--ink);
+        padding-bottom: 12px;
+      }
+      .masthead h1 {
+        font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+        font-weight: 600;
+        font-size: 27px;
+        margin: 0;
+      }
+      .masthead .today {
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        text-align: right;
+      }
 
-  nav.tabs {
-    display: flex;
-    gap: 22px;
-    margin: 16px 0 26px;
-    border-bottom: 1px solid var(--rule);
-  }
-  nav.tabs .tab {
-    font-size: 14.5px;
-    padding: 8px 2px 11px;
-    position: relative;
-    color: var(--ink-soft);
-    cursor: pointer;
-  }
-  nav.tabs .tab.active { color: var(--ink); }
-  nav.tabs .tab.active::after {
-    content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
-    height: 2px; background: var(--accent);
-  }
-  nav.tabs .tab.soon { opacity: 0.55; font-style: italic; }
-  nav.tabs .tab.soon .soon-tag {
-    font-size: 10px; margin-left: 4px; border: 1px solid var(--rule);
-    border-radius: 8px; padding: 1px 6px; vertical-align: 1px;
-  }
+      nav.tabs {
+        display: flex;
+        gap: 22px;
+        margin: 16px 0 26px;
+        border-bottom: 1px solid var(--rule);
+      }
+      nav.tabs .tab {
+        font-size: 14.5px;
+        padding: 8px 2px 11px;
+        position: relative;
+        color: var(--ink-soft);
+        cursor: pointer;
+      }
+      nav.tabs .tab.active {
+        color: var(--ink);
+      }
+      nav.tabs .tab.active::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -1px;
+        height: 2px;
+        background: var(--accent);
+      }
+      nav.tabs .tab.soon {
+        opacity: 0.55;
+        font-style: italic;
+      }
+      nav.tabs .tab.soon .soon-tag {
+        font-size: 10px;
+        margin-left: 4px;
+        border: 1px solid var(--rule);
+        border-radius: 8px;
+        padding: 1px 6px;
+        vertical-align: 1px;
+      }
 
-  .streak-line {
-    display: flex; align-items: center; gap: 8px;
-    font-size: 13.5px; color: var(--ink-soft);
-    margin-bottom: 22px; padding: 10px 12px;
-    background: var(--paper-raised); border: 1px solid var(--rule); border-radius: 4px;
-  }
-  .streak-num {
-    font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-    font-weight: 700; font-size: 18px; color: var(--ink);
-  }
+      .streak-line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13.5px;
+        color: var(--ink-soft);
+        margin-bottom: 22px;
+        padding: 10px 12px;
+        background: var(--paper-raised);
+        border: 1px solid var(--rule);
+        border-radius: 4px;
+      }
+      .streak-num {
+        font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+        font-weight: 700;
+        font-size: 18px;
+        color: var(--ink);
+      }
 
-  .block { margin-bottom: 30px; }
-  .block-head { margin-bottom: 12px; }
-  .block-head h2 {
-    font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-    font-size: 18px; font-weight: 600; margin: 0;
-  }
-  .block-head .sub { font-size: 12.5px; color: var(--ink-soft); }
+      .block {
+        margin-bottom: 30px;
+      }
+      .block-head {
+        margin-bottom: 12px;
+      }
+      .block-head h2 {
+        font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+      }
+      .block-head .sub {
+        font-size: 12.5px;
+        color: var(--ink-soft);
+      }
 
-  .mood-scale { display: flex; gap: 8px; margin-bottom: 16px; }
-  .mood-opt {
-    flex: 1; border: 1.5px solid var(--rule); border-radius: 4px;
-    padding: 11px 4px; text-align: center; background: var(--paper-raised);
-    cursor: pointer; font-size: 12.5px; color: var(--ink-soft);
-  }
-  .mood-opt .dot { width: 12px; height: 12px; border-radius: 50%; margin: 0 auto 6px; }
-  .mood-opt.selected { border-color: var(--ink); color: var(--ink); background: #fff; }
+      .mood-scale {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .mood-opt {
+        flex: 1;
+        border: 1.5px solid var(--rule);
+        border-radius: 4px;
+        padding: 11px 4px;
+        text-align: center;
+        background: var(--paper-raised);
+        cursor: pointer;
+        font-size: 12.5px;
+        color: var(--ink-soft);
+      }
+      .mood-opt .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin: 0 auto 6px;
+      }
+      .mood-opt.selected {
+        border-color: var(--ink);
+        color: var(--ink);
+        background: #fff;
+      }
 
-  .tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-  .tag-chip {
-    border: 1.5px solid var(--rule); border-radius: 16px; padding: 7px 13px;
-    font-size: 13px; color: var(--ink-soft); background: var(--paper-raised);
-    cursor: pointer;
-  }
-  .tag-chip.selected { border-color: var(--accent); color: var(--accent-ink); background: #fff; }
+      .tag-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .tag-chip {
+        border: 1.5px solid var(--rule);
+        border-radius: 16px;
+        padding: 7px 13px;
+        font-size: 13px;
+        color: var(--ink-soft);
+        background: var(--paper-raised);
+        cursor: pointer;
+      }
+      .tag-chip.selected {
+        border-color: var(--accent);
+        color: var(--accent-ink);
+        background: #fff;
+      }
 
-  .mood-note {
-    width: 100%; background: var(--paper-raised); border: 1px solid var(--rule);
-    border-radius: 3px; padding: 9px 11px; font-size: 14px; font-family: inherit;
-    color: var(--ink); resize: vertical; min-height: 50px; margin-bottom: 12px;
-  }
-  .mood-note:focus { outline: none; border-color: var(--accent); }
+      .mood-note {
+        width: 100%;
+        background: var(--paper-raised);
+        border: 1px solid var(--rule);
+        border-radius: 3px;
+        padding: 9px 11px;
+        font-size: 14px;
+        font-family: inherit;
+        color: var(--ink);
+        resize: vertical;
+        min-height: 50px;
+        margin-bottom: 12px;
+      }
+      .mood-note:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
 
-  .save-line { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
-  .save-line .saved-flag { font-size: 12.5px; color: var(--good); opacity: 0; transition: opacity 0.2s; }
-  .save-line .saved-flag.show { opacity: 1; }
-  .save-line button {
-    background: var(--ink); color: var(--paper); border: none; border-radius: 3px;
-    padding: 9px 18px; font-size: 13.5px; font-family: inherit; cursor: pointer;
-  }
-  .save-line button:hover { background: var(--accent-ink); }
-  .save-line button:disabled { opacity: 0.4; cursor: default; }
+      .save-line {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
+      }
+      .save-line .saved-flag {
+        font-size: 12.5px;
+        color: var(--good);
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .save-line .saved-flag.show {
+        opacity: 1;
+      }
+      .save-line button {
+        background: var(--ink);
+        color: var(--paper);
+        border: none;
+        border-radius: 3px;
+        padding: 9px 18px;
+        font-size: 13.5px;
+        font-family: inherit;
+        cursor: pointer;
+      }
+      .save-line button:hover {
+        background: var(--accent-ink);
+      }
+      .save-line button:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
 
-  .history-row {
-    display: grid; grid-template-columns: 70px 14px 1fr; gap: 12px;
-    align-items: start; padding: 10px 0; border-bottom: 1px solid var(--rule); font-size: 13.5px;
-  }
-  .history-row:last-child { border-bottom: none; }
-  .history-date { color: var(--ink-soft); padding-top: 1px; }
-  .history-dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 2px; }
-  .history-body .history-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 3px; }
-  .history-tags span {
-    font-size: 10.5px; color: var(--ink-soft); border: 1px solid var(--rule);
-    border-radius: 10px; padding: 1px 7px;
-  }
-  .history-note { line-height: 1.4; color: var(--ink); }
-  .history-note.empty { color: var(--ink-soft); font-style: italic; }
+      .history-row {
+        display: grid;
+        grid-template-columns: 70px 14px 1fr;
+        gap: 12px;
+        align-items: start;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--rule);
+        font-size: 13.5px;
+      }
+      .history-row:last-child {
+        border-bottom: none;
+      }
+      .history-date {
+        color: var(--ink-soft);
+        padding-top: 1px;
+      }
+      .history-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-top: 2px;
+      }
+      .history-body .history-tags {
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+        margin-bottom: 3px;
+      }
+      .history-tags span {
+        font-size: 10.5px;
+        color: var(--ink-soft);
+        border: 1px solid var(--rule);
+        border-radius: 10px;
+        padding: 1px 7px;
+      }
+      .history-note {
+        line-height: 1.4;
+        color: var(--ink);
+      }
+      .history-note.empty {
+        color: var(--ink-soft);
+        font-style: italic;
+      }
 
-  .note-banner {
-    font-size: 12px; color: var(--ink-soft); text-align: center;
-    margin-top: 30px; padding-top: 14px; border-top: 1px dashed var(--rule);
-  }
-  .entry-delete {
-    background: none; border: none; color: var(--ink-soft); font-size: 11.5px;
-    text-decoration: underline; cursor: pointer; padding: 2px 4px; opacity: 0.6;
-    white-space: nowrap;
-  }
-  .entry-delete:hover { opacity: 1; color: #8B4A3F; }
+      .note-banner {
+        font-size: 12px;
+        color: var(--ink-soft);
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 14px;
+        border-top: 1px dashed var(--rule);
+      }
+      .entry-delete {
+        background: none;
+        border: none;
+        color: var(--ink-soft);
+        font-size: 11.5px;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 2px 4px;
+        opacity: 0.6;
+        white-space: nowrap;
+      }
+      .entry-delete:hover {
+        opacity: 1;
+        color: #8b4a3f;
+      }
 
-  .todo-row {
-    display: flex; align-items: flex-start; gap: 10px;
-    padding: 10px 2px; border-bottom: 1px solid var(--rule);
-  }
-  .todo-row:last-child { border-bottom: none; }
-  .todo-check {
-    width: 20px; height: 20px; border: 1.5px solid var(--ink-soft); border-radius: 50%;
-    flex: 0 0 auto; margin-top: 2px; cursor: pointer; background: transparent; padding: 0;
-  }
-  .todo-check.done { background: var(--good); border-color: var(--good); }
-  .todo-priority-bar {
-    width: 4px; border-radius: 2px; flex: 0 0 auto; align-self: stretch; min-height: 20px;
-  }
-  .todo-main { flex: 1; min-width: 0; }
-  .todo-title { font-size: 14.5px; line-height: 1.4; color: var(--ink); }
-  .todo-meta { display: flex; gap: 8px; margin-top: 3px; flex-wrap: wrap; align-items: center; }
-  .todo-due { font-size: 11.5px; padding: 1px 7px; border-radius: 10px; border: 1px solid var(--rule); color: var(--ink-soft); }
-  .todo-due.overdue { color: #8B4A3F; border-color: #8B4A3F; }
-  .todo-due.today { color: var(--accent-ink); border-color: var(--accent); }
-  .todo-recur { font-size: 11px; color: var(--ink-soft); }
-  .todo-empty-section { font-size: 12.5px; color: var(--ink-soft); font-style: italic; padding: 4px 2px; }
+      .todo-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 2px;
+        border-bottom: 1px solid var(--rule);
+      }
+      .todo-row:last-child {
+        border-bottom: none;
+      }
+      .todo-check {
+        width: 20px;
+        height: 20px;
+        border: 1.5px solid var(--ink-soft);
+        border-radius: 50%;
+        flex: 0 0 auto;
+        margin-top: 2px;
+        cursor: pointer;
+        background: transparent;
+        padding: 0;
+      }
+      .todo-check.done {
+        background: var(--good);
+        border-color: var(--good);
+      }
+      .todo-check.done::after {
+        content: "";
+        display: block;
+        width: 9px;
+        height: 5px;
+        margin: 5px auto 0;
+        border-left: 2px solid var(--paper);
+        border-bottom: 2px solid var(--paper);
+        transform: rotate(-45deg) translate(1px, -1px);
+      }
+      @keyframes todo-pop {
+        0% {
+          transform: scale(1);
+        }
+        45% {
+          transform: scale(1.4);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      .todo-check.pop {
+        animation: todo-pop 0.3s ease;
+      }
+      .todo-priority-bar {
+        width: 4px;
+        border-radius: 2px;
+        flex: 0 0 auto;
+        align-self: stretch;
+        min-height: 20px;
+      }
+      .todo-main {
+        flex: 1;
+        min-width: 0;
+      }
+      .todo-title {
+        font-size: 14.5px;
+        line-height: 1.4;
+        color: var(--ink);
+      }
+      .todo-meta {
+        display: flex;
+        gap: 8px;
+        margin-top: 3px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .todo-due {
+        font-size: 11.5px;
+        padding: 1px 7px;
+        border-radius: 10px;
+        border: 1px solid var(--rule);
+        color: var(--ink-soft);
+      }
+      .todo-due.overdue {
+        color: #8b4a3f;
+        border-color: #8b4a3f;
+      }
+      .todo-due.today {
+        color: var(--accent-ink);
+        border-color: var(--accent);
+      }
+      .todo-recur {
+        font-size: 11px;
+        color: var(--ink-soft);
+      }
+      .todo-empty-section {
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        font-style: italic;
+        padding: 4px 2px;
+      }
 
-  @media (max-width: 420px) {
-    #root { padding: 20px 12px 40px; }
-    .mood-scale { flex-wrap: wrap; }
-    .mood-opt { flex: 1 1 30%; min-width: 30%; }
-  }
-</style>
-</head>
-<body>
-<div id="signin-gate" style="display:flex; min-height:100vh; align-items:center; justify-content:center; background:var(--paper); font-family:'Segoe UI',sans-serif; flex-direction:column; gap:12px; padding:20px;">
-  <div style="font-family:'Iowan Old Style','Palatino Linotype',Georgia,serif; font-size:28px; color:var(--ink);">HQ</div>
-  <div style="color:var(--ink-soft); font-size:13.5px;" id="signin-mode-label">Sign in to see your synced entries</div>
-  <input id="signin-email" type="email" placeholder="Email" autocomplete="username"
-    style="width:240px; padding:10px 12px; border:1px solid var(--rule); border-radius:4px; font-size:14px; background:var(--paper-raised); color:var(--ink);" />
-  <input id="signin-password" type="password" placeholder="Password" autocomplete="current-password"
-    style="width:240px; padding:10px 12px; border:1px solid var(--rule); border-radius:4px; font-size:14px; background:var(--paper-raised); color:var(--ink);" />
-  <button id="signin-btn" style="width:240px; background:var(--ink); color:var(--paper); border:none; border-radius:4px; padding:11px 0; font-size:14.5px; cursor:pointer;">Sign in</button>
-  <div id="signin-error" style="color:#8B4A3F; font-size:12.5px; min-height:16px;"></div>
-  <button id="signin-toggle" style="background:none; border:none; color:var(--ink-soft); font-size:12px; text-decoration:underline; cursor:pointer;">First time? Create your account</button>
-</div>
+      @media (max-width: 420px) {
+        #root {
+          padding: 20px 12px 40px;
+        }
+        .mood-scale {
+          flex-wrap: wrap;
+        }
+        .mood-opt {
+          flex: 1 1 30%;
+          min-width: 30%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="signin-gate"
+      style="
+        display: flex;
+        min-height: 100vh;
+        align-items: center;
+        justify-content: center;
+        background: var(--paper);
+        font-family: &quot;Segoe UI&quot;, sans-serif;
+        flex-direction: column;
+        gap: 12px;
+        padding: 20px;
+      "
+    >
+      <div
+        style="
+          font-family:
+            &quot;Iowan Old Style&quot;, &quot;Palatino Linotype&quot;, Georgia,
+            serif;
+          font-size: 28px;
+          color: var(--ink);
+        "
+      >
+        HQ
+      </div>
+      <div
+        style="color: var(--ink-soft); font-size: 13.5px"
+        id="signin-mode-label"
+      >
+        Sign in to see your synced entries
+      </div>
+      <input
+        id="signin-email"
+        type="email"
+        placeholder="Email"
+        autocomplete="username"
+        style="
+          width: 240px;
+          padding: 10px 12px;
+          border: 1px solid var(--rule);
+          border-radius: 4px;
+          font-size: 14px;
+          background: var(--paper-raised);
+          color: var(--ink);
+        "
+      />
+      <input
+        id="signin-password"
+        type="password"
+        placeholder="Password"
+        autocomplete="current-password"
+        style="
+          width: 240px;
+          padding: 10px 12px;
+          border: 1px solid var(--rule);
+          border-radius: 4px;
+          font-size: 14px;
+          background: var(--paper-raised);
+          color: var(--ink);
+        "
+      />
+      <button
+        id="signin-btn"
+        style="
+          width: 240px;
+          background: var(--ink);
+          color: var(--paper);
+          border: none;
+          border-radius: 4px;
+          padding: 11px 0;
+          font-size: 14.5px;
+          cursor: pointer;
+        "
+      >
+        Sign in
+      </button>
+      <div
+        id="signin-error"
+        style="color: #8b4a3f; font-size: 12.5px; min-height: 16px"
+      ></div>
+      <button
+        id="signin-toggle"
+        style="
+          background: none;
+          border: none;
+          color: var(--ink-soft);
+          font-size: 12px;
+          text-decoration: underline;
+          cursor: pointer;
+        "
+      >
+        First time? Create your account
+      </button>
+    </div>
 
-<div id="root" style="display:none;">
-  <div id="inner">
-    <div class="masthead">
-      <h1>HQ</h1>
-      <div style="text-align:right;">
-        <div class="today" id="today-label"></div>
-        <button id="signout-btn" style="background:none;border:none;color:var(--ink-soft);font-size:11.5px;text-decoration:underline;cursor:pointer;padding:2px 0;">sign out</button>
+    <div id="root" style="display: none">
+      <div id="inner">
+        <div class="masthead">
+          <h1>HQ</h1>
+          <div style="text-align: right">
+            <div class="today" id="today-label"></div>
+            <button
+              id="signout-btn"
+              style="
+                background: none;
+                border: none;
+                color: var(--ink-soft);
+                font-size: 11.5px;
+                text-decoration: underline;
+                cursor: pointer;
+                padding: 2px 0;
+              "
+            >
+              sign out
+            </button>
+          </div>
+        </div>
+
+        <nav class="tabs">
+          <div class="tab active" data-panel="mood">Mood</div>
+          <div class="tab" data-panel="mp">M/P Diary</div>
+          <div class="tab" data-panel="todo">To-Do</div>
+          <div class="tab soon">Journal <span class="soon-tag">soon</span></div>
+          <div class="tab soon">
+            Creativity <span class="soon-tag">soon</span>
+          </div>
+        </nav>
+
+        <div class="tab-panel" id="panel-mood">
+          <div class="streak-line" id="streak-line"></div>
+
+          <div class="block">
+            <div class="block-head">
+              <h2>How's today going</h2>
+            </div>
+            <div class="mood-scale" id="mood-scale"></div>
+
+            <div class="block-head" style="margin-top: 16px">
+              <span class="sub">Energy level (optional)</span>
+            </div>
+            <div class="mood-scale" id="energy-scale"></div>
+
+            <div class="block-head">
+              <span class="sub"
+                >What's playing into it? (optional, pick any)</span
+              >
+            </div>
+            <div class="tag-row" id="tag-row"></div>
+
+            <textarea
+              class="mood-note"
+              id="mood-note"
+              placeholder="Anything else, optional..."
+            ></textarea>
+
+            <div class="save-line">
+              <span class="saved-flag" id="saved-flag">Saved</span>
+              <button id="save-btn" disabled>Add entry</button>
+            </div>
+
+            <div id="today-entries" style="margin-top: 18px"></div>
+          </div>
+
+          <div class="block">
+            <div class="block-head"><h2>Recent history</h2></div>
+            <div id="history-list"></div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="panel-mp" style="display: none">
+          <div class="block">
+            <div class="block-head">
+              <h2>Log an activity</h2>
+              <span class="sub"
+                >Rate how much it took vs. how much you enjoyed it</span
+              >
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 12px">
+              <div style="flex: 1">
+                <label class="sub" style="display: block; margin-bottom: 4px"
+                  >Date</label
+                >
+                <input
+                  type="date"
+                  id="mp-date"
+                  style="
+                    width: 100%;
+                    padding: 9px 10px;
+                    border: 1px solid var(--rule);
+                    border-radius: 3px;
+                    background: var(--paper-raised);
+                    color: var(--ink);
+                    font-family: inherit;
+                    font-size: 14px;
+                  "
+                />
+              </div>
+              <div style="flex: 1">
+                <label class="sub" style="display: block; margin-bottom: 4px"
+                  >Time</label
+                >
+                <input
+                  type="time"
+                  id="mp-time"
+                  style="
+                    width: 100%;
+                    padding: 9px 10px;
+                    border: 1px solid var(--rule);
+                    border-radius: 3px;
+                    background: var(--paper-raised);
+                    color: var(--ink);
+                    font-family: inherit;
+                    font-size: 14px;
+                  "
+                />
+              </div>
+            </div>
+
+            <label class="sub" style="display: block; margin-bottom: 4px"
+              >Activity</label
+            >
+            <input
+              type="text"
+              id="mp-activity"
+              placeholder="What did you do?"
+              maxlength="140"
+              style="
+                width: 100%;
+                padding: 9px 11px;
+                border: 1px solid var(--rule);
+                border-radius: 3px;
+                background: var(--paper-raised);
+                color: var(--ink);
+                font-family: inherit;
+                font-size: 14.5px;
+                margin-bottom: 16px;
+              "
+            />
+
+            <div style="margin-bottom: 16px">
+              <label
+                class="sub"
+                style="display: flex; justify-content: space-between"
+              >
+                <span>Mastery (sense of accomplishment)</span>
+                <span
+                  id="mp-mastery-val"
+                  style="color: var(--ink); font-weight: 600"
+                  >5</span
+                >
+              </label>
+              <input
+                type="range"
+                id="mp-mastery"
+                min="0"
+                max="10"
+                value="5"
+                style="
+                  width: 100%;
+                  accent-color: var(--accent);
+                  margin-top: 6px;
+                "
+              />
+            </div>
+
+            <div style="margin-bottom: 18px">
+              <label
+                class="sub"
+                style="display: flex; justify-content: space-between"
+              >
+                <span>Pleasure (how much you enjoyed it)</span>
+                <span
+                  id="mp-pleasure-val"
+                  style="color: var(--ink); font-weight: 600"
+                  >5</span
+                >
+              </label>
+              <input
+                type="range"
+                id="mp-pleasure"
+                min="0"
+                max="10"
+                value="5"
+                style="width: 100%; accent-color: var(--good); margin-top: 6px"
+              />
+            </div>
+
+            <div class="save-line">
+              <span class="saved-flag" id="mp-saved-flag">Saved</span>
+              <button id="mp-save-btn">Add entry</button>
+            </div>
+          </div>
+
+          <div class="block">
+            <button
+              id="mp-import-toggle"
+              style="
+                background: none;
+                border: 1px solid var(--rule);
+                border-radius: 4px;
+                color: var(--ink-soft);
+                font-size: 12.5px;
+                padding: 7px 12px;
+                cursor: pointer;
+              "
+            >
+              Import from Google Sheets
+            </button>
+            <div id="mp-import-panel" style="display: none; margin-top: 12px">
+              <div class="sub" style="margin-bottom: 6px">
+                In your sheet, select your
+                Date/Day/Time/Activity/Mastery/Pleasure rows (no header row),
+                copy them (Ctrl+C), then paste below.
+              </div>
+              <textarea
+                id="mp-import-text"
+                placeholder="Paste rows here..."
+                style="
+                  width: 100%;
+                  min-height: 100px;
+                  background: var(--paper-raised);
+                  border: 1px solid var(--rule);
+                  border-radius: 3px;
+                  padding: 9px 11px;
+                  font-size: 13px;
+                  font-family: monospace;
+                  color: var(--ink);
+                "
+              ></textarea>
+              <div class="save-line" style="margin-top: 8px">
+                <span class="saved-flag" id="mp-import-flag">Imported</span>
+                <button id="mp-import-btn">Import rows</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="block">
+            <div class="block-head"><h2>History</h2></div>
+            <div style="overflow-x: auto">
+              <table
+                style="width: 100%; border-collapse: collapse; font-size: 13px"
+              >
+                <thead>
+                  <tr style="border-bottom: 1.5px solid var(--ink)">
+                    <th
+                      style="
+                        text-align: left;
+                        padding: 6px 8px;
+                        font-weight: 600;
+                      "
+                    >
+                      Date
+                    </th>
+                    <th
+                      style="
+                        text-align: left;
+                        padding: 6px 8px;
+                        font-weight: 600;
+                      "
+                    >
+                      Day
+                    </th>
+                    <th
+                      style="
+                        text-align: left;
+                        padding: 6px 8px;
+                        font-weight: 600;
+                      "
+                    >
+                      Time
+                    </th>
+                    <th
+                      style="
+                        text-align: left;
+                        padding: 6px 8px;
+                        font-weight: 600;
+                      "
+                    >
+                      Activity
+                    </th>
+                    <th
+                      style="
+                        text-align: center;
+                        padding: 6px 8px;
+                        font-weight: 600;
+                      "
+                    >
+                      Mastery
+                    </th>
+                    <th
+                      style="
+                        text-align: center;
+                        padding: 6px 8px;
+                        font-weight: 600;
+                      "
+                    >
+                      Pleasure
+                    </th>
+                    <th style="padding: 6px 8px"></th>
+                  </tr>
+                </thead>
+                <tbody id="mp-table-body"></tbody>
+              </table>
+              <div id="mp-empty" class="empty-note" style="display: none">
+                No entries yet.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="panel-todo" style="display: none">
+          <div class="block">
+            <div class="block-head">
+              <h2>Add a task</h2>
+              <span class="sub"
+                >Try typing naturally, e.g. "Call dentist tomorrow 2pm p2
+                weekly"</span
+              >
+            </div>
+            <div style="display: flex; gap: 8px">
+              <input
+                type="text"
+                id="todo-quickadd"
+                placeholder="What needs doing?"
+                maxlength="160"
+                style="
+                  flex: 1;
+                  padding: 10px 12px;
+                  border: 1px solid var(--rule);
+                  border-radius: 3px;
+                  background: var(--paper-raised);
+                  color: var(--ink);
+                  font-family: inherit;
+                  font-size: 14.5px;
+                "
+              />
+              <button
+                id="todo-add-btn"
+                style="
+                  background: var(--ink);
+                  color: var(--paper);
+                  border: none;
+                  border-radius: 3px;
+                  padding: 0 18px;
+                  font-size: 14px;
+                  cursor: pointer;
+                "
+              >
+                Add
+              </button>
+            </div>
+            <div
+              id="todo-parse-preview"
+              class="sub"
+              style="margin-top: 8px; min-height: 16px"
+            ></div>
+
+            <button
+              id="todo-more-toggle"
+              style="
+                margin-top: 10px;
+                background: none;
+                border: none;
+                color: var(--ink-soft);
+                font-size: 12px;
+                text-decoration: underline;
+                cursor: pointer;
+                padding: 0;
+              "
+            >
+              Adjust date, time, priority, repeat
+            </button>
+            <div
+              id="todo-more-panel"
+              style="
+                display: none;
+                margin-top: 12px;
+                gap: 10px;
+                flex-wrap: wrap;
+              "
+            >
+              <div>
+                <label class="sub" style="display: block; margin-bottom: 4px"
+                  >Date</label
+                >
+                <input
+                  type="date"
+                  id="todo-date"
+                  style="
+                    padding: 8px 9px;
+                    border: 1px solid var(--rule);
+                    border-radius: 3px;
+                    background: var(--paper-raised);
+                    color: var(--ink);
+                    font-family: inherit;
+                    font-size: 13.5px;
+                  "
+                />
+              </div>
+              <div>
+                <label class="sub" style="display: block; margin-bottom: 4px"
+                  >Time</label
+                >
+                <input
+                  type="time"
+                  id="todo-time"
+                  style="
+                    padding: 8px 9px;
+                    border: 1px solid var(--rule);
+                    border-radius: 3px;
+                    background: var(--paper-raised);
+                    color: var(--ink);
+                    font-family: inherit;
+                    font-size: 13.5px;
+                  "
+                />
+              </div>
+              <div>
+                <label class="sub" style="display: block; margin-bottom: 4px"
+                  >Priority</label
+                >
+                <select
+                  id="todo-priority"
+                  style="
+                    padding: 8px 9px;
+                    border: 1px solid var(--rule);
+                    border-radius: 3px;
+                    background: var(--paper-raised);
+                    color: var(--ink);
+                    font-family: inherit;
+                    font-size: 13.5px;
+                  "
+                >
+                  <option value="4">p4 — none</option>
+                  <option value="3">p3 — low</option>
+                  <option value="2">p2 — medium</option>
+                  <option value="1">p1 — urgent</option>
+                </select>
+              </div>
+              <div>
+                <label class="sub" style="display: block; margin-bottom: 4px"
+                  >Repeat</label
+                >
+                <select
+                  id="todo-recurrence"
+                  style="
+                    padding: 8px 9px;
+                    border: 1px solid var(--rule);
+                    border-radius: 3px;
+                    background: var(--paper-raised);
+                    color: var(--ink);
+                    font-family: inherit;
+                    font-size: 13.5px;
+                  "
+                >
+                  <option value="none">Doesn't repeat</option>
+                  <option value="daily">Every day</option>
+                  <option value="weekly">Every week</option>
+                  <option value="monthly">Every month</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="block" id="todo-section-overdue" style="display: none">
+            <div class="block-head">
+              <h2 style="color: #8b4a3f">Overdue</h2>
+            </div>
+            <div id="todo-list-overdue"></div>
+          </div>
+          <div class="block">
+            <div class="block-head"><h2>Today</h2></div>
+            <div id="todo-list-today"></div>
+          </div>
+          <div class="block">
+            <div class="block-head"><h2>Upcoming</h2></div>
+            <div id="todo-list-upcoming"></div>
+          </div>
+          <div id="todo-empty" class="empty-note" style="display: none">
+            No tasks yet — add one above.
+          </div>
+        </div>
       </div>
     </div>
 
-    <nav class="tabs">
-      <div class="tab active" data-panel="mood">Mood</div>
-      <div class="tab" data-panel="mp">M/P Diary</div>
-      <div class="tab" data-panel="todo">To-Do</div>
-      <div class="tab soon">Journal <span class="soon-tag">soon</span></div>
-      <div class="tab soon">Creativity <span class="soon-tag">soon</span></div>
-    </nav>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+      import {
+        getAuth,
+        signInWithEmailAndPassword,
+        createUserWithEmailAndPassword,
+        signOut,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        deleteDoc,
+        updateDoc,
+        query,
+        orderBy,
+        onSnapshot,
+        serverTimestamp,
+        Timestamp,
+        writeBatch,
+        doc,
+      } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-    <div class="tab-panel" id="panel-mood">
-    <div class="streak-line" id="streak-line"></div>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBZ15HhvM6LnYhkSF1T-XXZi1WMkC4OB4A",
+        authDomain: "my-hq-6082b.firebaseapp.com",
+        projectId: "my-hq-6082b",
+        storageBucket: "my-hq-6082b.firebasestorage.app",
+        messagingSenderId: "294542508151",
+        appId: "1:294542508151:web:aa564518efe649d4730672",
+      };
 
-    <div class="block">
-      <div class="block-head">
-        <h2>How's today going</h2>
-      </div>
-      <div class="mood-scale" id="mood-scale"></div>
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+      const ALLOWED_UID = "uoU0LB6GMTZ4af7NWJIpE8oKsDU2";
 
-      <div class="block-head" style="margin-top:16px;">
-        <span class="sub">Energy level (optional)</span>
-      </div>
-      <div class="mood-scale" id="energy-scale"></div>
+      (function () {
+        const MOODS = [
+          { key: "rough", label: "Rough", color: "var(--rough)" },
+          { key: "low", label: "Low", color: "var(--low)" },
+          { key: "okay", label: "Okay", color: "var(--okay)" },
+          { key: "good", label: "Good", color: "var(--good)" },
+          { key: "great", label: "Great", color: "var(--great)" },
+        ];
+        const ENERGY = [
+          { key: "drained", label: "Drained", color: "#8B5E6B" },
+          { key: "low", label: "Low", color: "#A98A5C" },
+          { key: "steady", label: "Steady", color: "#A9821F" },
+          { key: "energized", label: "Energized", color: "#5C8A66" },
+          { key: "wired", label: "Wired", color: "#3E6E86" },
+        ];
+        const TAGS = [
+          "Work",
+          "Sleep",
+          "Social",
+          "Health",
+          "Family",
+          "Money",
+          "Weather",
+        ];
 
-      <div class="block-head">
-        <span class="sub">What's playing into it? (optional, pick any)</span>
-      </div>
-      <div class="tag-row" id="tag-row"></div>
+        function pad(n) {
+          return n < 10 ? "0" + n : "" + n;
+        }
+        function dateKey(d) {
+          return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+        }
+        function fmtShort(d) {
+          return d.toLocaleDateString(undefined, {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+          });
+        }
+        function fmtLong(d) {
+          return d.toLocaleDateString(undefined, {
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+          });
+        }
 
-      <textarea class="mood-note" id="mood-note" placeholder="Anything else, optional..."></textarea>
+        const today = new Date();
+        const todayKey = dateKey(today);
+        document.getElementById("today-label").textContent = fmtLong(today);
 
-      <div class="save-line">
-        <span class="saved-flag" id="saved-flag">Saved</span>
-        <button id="save-btn" disabled>Add entry</button>
-      </div>
+        function fmtTime(d) {
+          return d.toLocaleTimeString(undefined, {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
+        }
 
-      <div id="today-entries" style="margin-top:18px;"></div>
-    </div>
+        // escape user-entered text before it goes into innerHTML
+        function escapeHtml(v) {
+          return String(v == null ? "" : v)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+        }
 
-    <div class="block">
-      <div class="block-head"><h2>Recent history</h2></div>
-      <div id="history-list"></div>
-    </div>
-    </div>
+        // ---- fake seed history (in-memory only, for this preview) ----
+        // history[dateKey] = array of entries, each { id, time, mood, energy, tags, note }
+        const history = {};
+        let currentUser = null;
+        let unsubscribeEntries = null;
+        let mpEntries = [];
+        let unsubscribeMP = null;
+        let todos = [];
+        let unsubscribeTodos = null;
 
-    <div class="tab-panel" id="panel-mp" style="display:none;">
-      <div class="block">
-        <div class="block-head">
-          <h2>Log an activity</h2>
-          <span class="sub">Rate how much it took vs. how much you enjoyed it</span>
-        </div>
+        let isCreateMode = false;
+        document
+          .getElementById("signin-password")
+          .addEventListener("keydown", (e) => {
+            if (e.key === "Enter")
+              document.getElementById("signin-btn").click();
+          });
+        document
+          .getElementById("signin-toggle")
+          .addEventListener("click", () => {
+            isCreateMode = !isCreateMode;
+            document.getElementById("signin-mode-label").textContent =
+              isCreateMode
+                ? "Create your account"
+                : "Sign in to see your synced entries";
+            document.getElementById("signin-btn").textContent = isCreateMode
+              ? "Create account"
+              : "Sign in";
+            document.getElementById("signin-toggle").textContent = isCreateMode
+              ? "Already have an account? Sign in"
+              : "First time? Create your account";
+            document.getElementById("signin-error").textContent = "";
+          });
 
-        <div style="display:flex; gap:10px; margin-bottom:12px;">
-          <div style="flex:1;">
-            <label class="sub" style="display:block; margin-bottom:4px;">Date</label>
-            <input type="date" id="mp-date" style="width:100%; padding:9px 10px; border:1px solid var(--rule); border-radius:3px; background:var(--paper-raised); color:var(--ink); font-family:inherit; font-size:14px;" />
-          </div>
-          <div style="flex:1;">
-            <label class="sub" style="display:block; margin-bottom:4px;">Time</label>
-            <input type="time" id="mp-time" style="width:100%; padding:9px 10px; border:1px solid var(--rule); border-radius:3px; background:var(--paper-raised); color:var(--ink); font-family:inherit; font-size:14px;" />
-          </div>
-        </div>
-
-        <label class="sub" style="display:block; margin-bottom:4px;">Activity</label>
-        <input type="text" id="mp-activity" placeholder="What did you do?" maxlength="140"
-          style="width:100%; padding:9px 11px; border:1px solid var(--rule); border-radius:3px; background:var(--paper-raised); color:var(--ink); font-family:inherit; font-size:14.5px; margin-bottom:16px;" />
-
-        <div style="margin-bottom:16px;">
-          <label class="sub" style="display:flex; justify-content:space-between;">
-            <span>Mastery (sense of accomplishment)</span>
-            <span id="mp-mastery-val" style="color:var(--ink); font-weight:600;">5</span>
-          </label>
-          <input type="range" id="mp-mastery" min="0" max="10" value="5" style="width:100%; accent-color: var(--accent); margin-top:6px;" />
-        </div>
-
-        <div style="margin-bottom:18px;">
-          <label class="sub" style="display:flex; justify-content:space-between;">
-            <span>Pleasure (how much you enjoyed it)</span>
-            <span id="mp-pleasure-val" style="color:var(--ink); font-weight:600;">5</span>
-          </label>
-          <input type="range" id="mp-pleasure" min="0" max="10" value="5" style="width:100%; accent-color: var(--good); margin-top:6px;" />
-        </div>
-
-        <div class="save-line">
-          <span class="saved-flag" id="mp-saved-flag">Saved</span>
-          <button id="mp-save-btn">Add entry</button>
-        </div>
-      </div>
-
-      <div class="block">
-        <button id="mp-import-toggle" style="background:none; border:1px solid var(--rule); border-radius:4px; color:var(--ink-soft); font-size:12.5px; padding:7px 12px; cursor:pointer;">Import from Google Sheets</button>
-        <div id="mp-import-panel" style="display:none; margin-top:12px;">
-          <div class="sub" style="margin-bottom:6px;">
-            In your sheet, select your Date/Day/Time/Activity/Mastery/Pleasure rows (no header row), copy them (Ctrl+C), then paste below.
-          </div>
-          <textarea id="mp-import-text" placeholder="Paste rows here..." style="width:100%; min-height:100px; background:var(--paper-raised); border:1px solid var(--rule); border-radius:3px; padding:9px 11px; font-size:13px; font-family:monospace; color:var(--ink);"></textarea>
-          <div class="save-line" style="margin-top:8px;">
-            <span class="saved-flag" id="mp-import-flag">Imported</span>
-            <button id="mp-import-btn">Import rows</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="block">
-        <div class="block-head"><h2>History</h2></div>
-        <div style="overflow-x:auto;">
-          <table style="width:100%; border-collapse:collapse; font-size:13px;">
-            <thead>
-              <tr style="border-bottom:1.5px solid var(--ink);">
-                <th style="text-align:left; padding:6px 8px; font-weight:600;">Date</th>
-                <th style="text-align:left; padding:6px 8px; font-weight:600;">Day</th>
-                <th style="text-align:left; padding:6px 8px; font-weight:600;">Time</th>
-                <th style="text-align:left; padding:6px 8px; font-weight:600;">Activity</th>
-                <th style="text-align:center; padding:6px 8px; font-weight:600;">Mastery</th>
-                <th style="text-align:center; padding:6px 8px; font-weight:600;">Pleasure</th>
-                <th style="padding:6px 8px;"></th>
-              </tr>
-            </thead>
-            <tbody id="mp-table-body"></tbody>
-          </table>
-          <div id="mp-empty" class="empty-note" style="display:none;">No entries yet.</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="tab-panel" id="panel-todo" style="display:none;">
-      <div class="block">
-        <div class="block-head">
-          <h2>Add a task</h2>
-          <span class="sub">Try typing naturally, e.g. "Call dentist tomorrow 2pm p2 weekly"</span>
-        </div>
-        <div style="display:flex; gap:8px;">
-          <input type="text" id="todo-quickadd" placeholder="What needs doing?" maxlength="160"
-            style="flex:1; padding:10px 12px; border:1px solid var(--rule); border-radius:3px; background:var(--paper-raised); color:var(--ink); font-family:inherit; font-size:14.5px;" />
-          <button id="todo-add-btn" style="background:var(--ink); color:var(--paper); border:none; border-radius:3px; padding:0 18px; font-size:14px; cursor:pointer;">Add</button>
-        </div>
-        <div id="todo-parse-preview" class="sub" style="margin-top:8px; min-height:16px;"></div>
-
-        <button id="todo-more-toggle" style="margin-top:10px; background:none; border:none; color:var(--ink-soft); font-size:12px; text-decoration:underline; cursor:pointer; padding:0;">Adjust date, time, priority, repeat</button>
-        <div id="todo-more-panel" style="display:none; margin-top:12px; gap:10px; flex-wrap:wrap;">
-          <div>
-            <label class="sub" style="display:block; margin-bottom:4px;">Date</label>
-            <input type="date" id="todo-date" style="padding:8px 9px; border:1px solid var(--rule); border-radius:3px; background:var(--paper-raised); color:var(--ink); font-family:inherit; font-size:13.5px;" />
-          </div>
-          <div>
-            <label class="sub" style="display:block; margin-bottom:4px;">Time</label>
-            <input type="time" id="todo-time" style="padding:8px 9px; border:1px solid var(--rule); border-radius:3px; background:var(--paper-raised); color:var(--ink); font-family:inherit; font-size:13.5px;" />
-          </div>
-          <div>
-            <label class="sub" style="display:block; margin-bottom:4px;">Priority</label>
-            <select id="todo-priority" style="padding:8px 9px; border:1px solid var(--rule); border-radius:3px; background:var(--paper-raised); color:var(--ink); font-family:inherit; font-size:13.5px;">
-              <option value="4">p4 — none</option>
-              <option value="3">p3 — low</option>
-              <option value="2">p2 — medium</option>
-              <option value="1">p1 — urgent</option>
-            </select>
-          </div>
-          <div>
-            <label class="sub" style="display:block; margin-bottom:4px;">Repeat</label>
-            <select id="todo-recurrence" style="padding:8px 9px; border:1px solid var(--rule); border-radius:3px; background:var(--paper-raised); color:var(--ink); font-family:inherit; font-size:13.5px;">
-              <option value="none">Doesn't repeat</option>
-              <option value="daily">Every day</option>
-              <option value="weekly">Every week</option>
-              <option value="monthly">Every month</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div class="block" id="todo-section-overdue" style="display:none;">
-        <div class="block-head"><h2 style="color:#8B4A3F;">Overdue</h2></div>
-        <div id="todo-list-overdue"></div>
-      </div>
-      <div class="block">
-        <div class="block-head"><h2>Today</h2></div>
-        <div id="todo-list-today"></div>
-      </div>
-      <div class="block">
-        <div class="block-head"><h2>Upcoming</h2></div>
-        <div id="todo-list-upcoming"></div>
-      </div>
-      <div id="todo-empty" class="empty-note" style="display:none;">No tasks yet — add one above.</div>
-    </div>
-  </div>
-</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import {
-  getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import {
-  getFirestore, collection, addDoc, deleteDoc, updateDoc, query, orderBy, onSnapshot, serverTimestamp, Timestamp, writeBatch, doc
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBZ15HhvM6LnYhkSF1T-XXZi1WMkC4OB4A",
-  authDomain: "my-hq-6082b.firebaseapp.com",
-  projectId: "my-hq-6082b",
-  storageBucket: "my-hq-6082b.firebasestorage.app",
-  messagingSenderId: "294542508151",
-  appId: "1:294542508151:web:aa564518efe649d4730672",
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const ALLOWED_UID = "uoU0LB6GMTZ4af7NWJIpE8oKsDU2";
-
-(function () {
-  const MOODS = [
-    { key: "rough", label: "Rough", color: "var(--rough)" },
-    { key: "low", label: "Low", color: "var(--low)" },
-    { key: "okay", label: "Okay", color: "var(--okay)" },
-    { key: "good", label: "Good", color: "var(--good)" },
-    { key: "great", label: "Great", color: "var(--great)" },
-  ];
-  const ENERGY = [
-    { key: "drained", label: "Drained", color: "#8B5E6B" },
-    { key: "low", label: "Low", color: "#A98A5C" },
-    { key: "steady", label: "Steady", color: "#A9821F" },
-    { key: "energized", label: "Energized", color: "#5C8A66" },
-    { key: "wired", label: "Wired", color: "#3E6E86" },
-  ];
-  const TAGS = ["Work", "Sleep", "Social", "Health", "Family", "Money", "Weather"];
-
-  function pad(n) { return n < 10 ? "0" + n : "" + n; }
-  function dateKey(d) { return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
-  function fmtShort(d) { return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }); }
-  function fmtLong(d) { return d.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" }); }
-
-  const today = new Date();
-  const todayKey = dateKey(today);
-  document.getElementById("today-label").textContent = fmtLong(today);
-
-  function fmtTime(d) { return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", hour12: false }); }
-
-  // ---- fake seed history (in-memory only, for this preview) ----
-  // history[dateKey] = array of entries, each { id, time, mood, energy, tags, note }
-  const history = {};
-  let currentUser = null;
-  let unsubscribeEntries = null;
-  let mpEntries = [];
-  let unsubscribeMP = null;
-  let todos = [];
-  let unsubscribeTodos = null;
-
-  let isCreateMode = false;
-  document.getElementById("signin-password").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") document.getElementById("signin-btn").click();
-  });
-  document.getElementById("signin-toggle").addEventListener("click", () => {
-    isCreateMode = !isCreateMode;
-    document.getElementById("signin-mode-label").textContent = isCreateMode
-      ? "Create your account" : "Sign in to see your synced entries";
-    document.getElementById("signin-btn").textContent = isCreateMode ? "Create account" : "Sign in";
-    document.getElementById("signin-toggle").textContent = isCreateMode
-      ? "Already have an account? Sign in" : "First time? Create your account";
-    document.getElementById("signin-error").textContent = "";
-  });
-
-  document.getElementById("signin-btn").addEventListener("click", () => {
-    const email = document.getElementById("signin-email").value.trim();
-    const password = document.getElementById("signin-password").value;
-    const errEl = document.getElementById("signin-error");
-    errEl.textContent = "";
-    if (!email || !password) {
-      errEl.textContent = "Enter both email and password.";
-      return;
-    }
-    const action = isCreateMode
-      ? createUserWithEmailAndPassword(auth, email, password)
-      : signInWithEmailAndPassword(auth, email, password);
-    action.catch(err => {
-      errEl.textContent = err.message.replace("Firebase: ", "").replace(/\s*\(auth\/.*\)\.?/, "");
-    });
-  });
-
-  document.getElementById("signout-btn").addEventListener("click", () => {
-    signOut(auth);
-  });
-
-  onAuthStateChanged(auth, (user) => {
-    if (user && user.uid !== ALLOWED_UID) {
-      signOut(auth);
-      document.getElementById("signin-error").textContent = "This app is private and restricted to its owner.";
-      return;
-    }
-    currentUser = user;
-    if (unsubscribeEntries) { unsubscribeEntries(); unsubscribeEntries = null; }
-    if (unsubscribeMP) { unsubscribeMP(); unsubscribeMP = null; }
-    if (unsubscribeTodos) { unsubscribeTodos(); unsubscribeTodos = null; }
-    Object.keys(history).forEach(k => delete history[k]);
-    mpEntries = [];
-    todos = [];
-
-    if (user) {
-      document.getElementById("signin-gate").style.display = "none";
-      document.getElementById("root").style.display = "flex";
-      const entriesRef = collection(db, "users", user.uid, "entries");
-      const q = query(entriesRef, orderBy("createdAt", "asc"));
-      unsubscribeEntries = onSnapshot(q, (snapshot) => {
-        Object.keys(history).forEach(k => delete history[k]);
-        snapshot.forEach(docSnap => {
-          const data = docSnap.data();
-          if (!history[data.dateKey]) history[data.dateKey] = [];
-          history[data.dateKey].push({
-            id: docSnap.id,
-            time: data.time,
-            mood: data.mood,
-            energy: data.energy || null,
-            tags: data.tags || [],
-            note: data.note || "",
+        document.getElementById("signin-btn").addEventListener("click", () => {
+          const email = document.getElementById("signin-email").value.trim();
+          const password = document.getElementById("signin-password").value;
+          const errEl = document.getElementById("signin-error");
+          errEl.textContent = "";
+          if (!email || !password) {
+            errEl.textContent = "Enter both email and password.";
+            return;
+          }
+          const action = isCreateMode
+            ? createUserWithEmailAndPassword(auth, email, password)
+            : signInWithEmailAndPassword(auth, email, password);
+          action.catch((err) => {
+            errEl.textContent = err.message
+              .replace("Firebase: ", "")
+              .replace(/\s*\(auth\/.*\)\.?/, "");
           });
         });
+
+        document.getElementById("signout-btn").addEventListener("click", () => {
+          signOut(auth);
+        });
+
+        onAuthStateChanged(auth, (user) => {
+          if (user && user.uid !== ALLOWED_UID) {
+            signOut(auth);
+            document.getElementById("signin-error").textContent =
+              "This app is private and restricted to its owner.";
+            return;
+          }
+          currentUser = user;
+          if (unsubscribeEntries) {
+            unsubscribeEntries();
+            unsubscribeEntries = null;
+          }
+          if (unsubscribeMP) {
+            unsubscribeMP();
+            unsubscribeMP = null;
+          }
+          if (unsubscribeTodos) {
+            unsubscribeTodos();
+            unsubscribeTodos = null;
+          }
+          Object.keys(history).forEach((k) => delete history[k]);
+          mpEntries = [];
+          todos = [];
+
+          if (user) {
+            document.getElementById("signin-gate").style.display = "none";
+            document.getElementById("root").style.display = "flex";
+            const entriesRef = collection(db, "users", user.uid, "entries");
+            const q = query(entriesRef, orderBy("createdAt", "asc"));
+            unsubscribeEntries = onSnapshot(
+              q,
+              (snapshot) => {
+                Object.keys(history).forEach((k) => delete history[k]);
+                snapshot.forEach((docSnap) => {
+                  const data = docSnap.data();
+                  if (!history[data.dateKey]) history[data.dateKey] = [];
+                  history[data.dateKey].push({
+                    id: docSnap.id,
+                    time: data.time,
+                    mood: data.mood,
+                    energy: data.energy || null,
+                    tags: data.tags || [],
+                    note: data.note || "",
+                  });
+                });
+                renderStreak();
+                renderTodayEntries();
+                renderHistory();
+              },
+              (err) => {
+                console.error("Firestore listen failed", err);
+              },
+            );
+
+            const mpRef = collection(db, "users", user.uid, "mpEntries");
+            const mpQ = query(
+              mpRef,
+              orderBy("dateKey", "desc"),
+              orderBy("time", "desc"),
+            );
+            unsubscribeMP = onSnapshot(
+              mpQ,
+              (snapshot) => {
+                mpEntries = snapshot.docs.map((d) => ({
+                  id: d.id,
+                  ...d.data(),
+                }));
+                renderMPTable();
+              },
+              (err) => {
+                console.error("MP Firestore listen failed", err);
+              },
+            );
+
+            const todosRef = collection(db, "users", user.uid, "todos");
+            const todosQ = query(
+              todosRef,
+              orderBy("dueDate", "asc"),
+              orderBy("dueTime", "asc"),
+            );
+            unsubscribeTodos = onSnapshot(
+              todosQ,
+              (snapshot) => {
+                todos = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+                renderTodos();
+              },
+              (err) => {
+                console.error("Todos Firestore listen failed", err);
+              },
+            );
+          } else {
+            document.getElementById("signin-gate").style.display = "flex";
+            document.getElementById("root").style.display = "none";
+          }
+        });
+
+        async function deleteMoodEntry(id) {
+          if (!currentUser || !id) return;
+          if (!confirm("Delete this entry? This can't be undone.")) return;
+          try {
+            await deleteDoc(doc(db, "users", currentUser.uid, "entries", id));
+          } catch (err) {
+            alert("Couldn't delete: " + err.message);
+          }
+        }
+        async function deleteMPEntry(id) {
+          if (!currentUser || !id) return;
+          if (!confirm("Delete this entry? This can't be undone.")) return;
+          try {
+            await deleteDoc(doc(db, "users", currentUser.uid, "mpEntries", id));
+          } catch (err) {
+            alert("Couldn't delete: " + err.message);
+          }
+        }
+        // event delegation so re-rendered rows keep working without re-attaching listeners
+        document
+          .getElementById("today-entries")
+          .addEventListener("click", (e) => {
+            const btn = e.target.closest(".entry-delete");
+            if (btn) deleteMoodEntry(btn.dataset.id);
+          });
+        document
+          .getElementById("history-list")
+          .addEventListener("click", (e) => {
+            const btn = e.target.closest(".entry-delete");
+            if (btn) deleteMoodEntry(btn.dataset.id);
+          });
+        document
+          .getElementById("mp-table-body")
+          .addEventListener("click", (e) => {
+            const btn = e.target.closest(".entry-delete");
+            if (btn) deleteMPEntry(btn.dataset.id);
+          });
+
+        let selectedMood = null;
+        let selectedEnergy = null;
+        let selectedTags = new Set();
+
+        // ---- mood scale ----
+        const scaleEl = document.getElementById("mood-scale");
+        MOODS.forEach((m) => {
+          const opt = document.createElement("div");
+          opt.className = "mood-opt";
+          opt.dataset.key = m.key;
+          opt.innerHTML = `<div class="dot" style="background:${m.color}"></div>${m.label}`;
+          opt.addEventListener("click", () => {
+            selectedMood = m.key;
+            renderScale();
+            updateSaveState();
+          });
+          scaleEl.appendChild(opt);
+        });
+        function renderScale() {
+          document.querySelectorAll("#mood-scale .mood-opt").forEach((el) => {
+            el.classList.toggle("selected", el.dataset.key === selectedMood);
+          });
+        }
+
+        // ---- energy scale (optional) ----
+        const energyEl = document.getElementById("energy-scale");
+        ENERGY.forEach((en) => {
+          const opt = document.createElement("div");
+          opt.className = "mood-opt";
+          opt.dataset.key = en.key;
+          opt.innerHTML = `<div class="dot" style="background:${en.color}"></div>${en.label}`;
+          opt.addEventListener("click", () => {
+            selectedEnergy = selectedEnergy === en.key ? null : en.key;
+            renderEnergyScale();
+          });
+          energyEl.appendChild(opt);
+        });
+        function renderEnergyScale() {
+          document.querySelectorAll("#energy-scale .mood-opt").forEach((el) => {
+            el.classList.toggle("selected", el.dataset.key === selectedEnergy);
+          });
+        }
+
+        // ---- tags ----
+        const tagRow = document.getElementById("tag-row");
+        TAGS.forEach((t) => {
+          const chip = document.createElement("div");
+          chip.className = "tag-chip";
+          chip.textContent = t;
+          chip.addEventListener("click", () => {
+            if (selectedTags.has(t)) selectedTags.delete(t);
+            else selectedTags.add(t);
+            chip.classList.toggle("selected");
+          });
+          tagRow.appendChild(chip);
+        });
+
+        function updateSaveState() {
+          document.getElementById("save-btn").disabled = !selectedMood;
+        }
+
+        document
+          .getElementById("save-btn")
+          .addEventListener("click", async () => {
+            if (!selectedMood || !currentUser) return;
+            const now = new Date();
+            const entriesRef = collection(
+              db,
+              "users",
+              currentUser.uid,
+              "entries",
+            );
+            const btn = document.getElementById("save-btn");
+            btn.disabled = true;
+            try {
+              await addDoc(entriesRef, {
+                dateKey: todayKey,
+                time: fmtTime(now),
+                mood: selectedMood,
+                energy: selectedEnergy,
+                tags: Array.from(selectedTags),
+                note: document.getElementById("mood-note").value.trim(),
+                createdAt: serverTimestamp(),
+              });
+
+              // reset the entry form for the next check-in
+              selectedMood = null;
+              selectedEnergy = null;
+              selectedTags = new Set();
+              document
+                .querySelectorAll(".tag-chip.selected")
+                .forEach((el) => el.classList.remove("selected"));
+              document.getElementById("mood-note").value = "";
+              renderScale();
+              renderEnergyScale();
+
+              const flag = document.getElementById("saved-flag");
+              flag.classList.add("show");
+              setTimeout(() => flag.classList.remove("show"), 1500);
+              // renderStreak/renderTodayEntries/renderHistory fire automatically via the Firestore listener
+            } catch (err) {
+              alert("Couldn't save: " + err.message);
+            } finally {
+              updateSaveState();
+            }
+          });
+
+        // ---- streak (a day counts if it has at least one entry) ----
+        function renderStreak() {
+          let streak = 0;
+          let cursor = new Date(today);
+          while (true) {
+            const key = dateKey(cursor);
+            if (history[key] && history[key].length > 0) {
+              streak++;
+              cursor.setDate(cursor.getDate() - 1);
+            } else {
+              break;
+            }
+          }
+          const el = document.getElementById("streak-line");
+          if (streak === 0) {
+            el.innerHTML = `No streak yet today — log your mood to start one.`;
+          } else {
+            el.innerHTML = `<span class="streak-num">${streak}</span> day${streak === 1 ? "" : "s"} logged in a row`;
+          }
+        }
+
+        // ---- today's entries so far ----
+        function renderTodayEntries() {
+          const container = document.getElementById("today-entries");
+          const entries = history[todayKey] || [];
+          if (entries.length === 0) {
+            container.innerHTML = "";
+            return;
+          }
+          container.innerHTML =
+            `<div class="sub" style="margin-bottom:8px;">Logged today (${entries.length})</div>` +
+            entries
+              .map((e) => {
+                const moodDef = MOODS.find((m) => m.key === e.mood);
+                const energyDef = e.energy
+                  ? ENERGY.find((en) => en.key === e.energy)
+                  : null;
+                const label = energyDef
+                  ? `${moodDef.label} · ${energyDef.label}`
+                  : moodDef.label;
+                const tagsHtml =
+                  e.tags && e.tags.length
+                    ? `<div class="history-tags">${e.tags.map((t) => `<span>${escapeHtml(t)}</span>`).join("")}</div>`
+                    : "";
+                return `<div class="history-row" style="grid-template-columns:60px 14px 1fr auto;">
+            <div class="history-date">${escapeHtml(e.time)}</div>
+            <div class="history-dot" style="background:${moodDef.color}"></div>
+            <div class="history-body">${tagsHtml}<div class="history-note${e.note ? "" : " empty"}">${e.note ? escapeHtml(e.note) : label}</div></div>
+            <button class="entry-delete" data-id="${e.id}">delete</button>
+          </div>`;
+              })
+              .join("");
+        }
+
+        // ---- history list (grouped by day, most recent first) ----
+        function renderHistory() {
+          const container = document.getElementById("history-list");
+          container.innerHTML = "";
+          for (let i = 0; i < 10; i++) {
+            const d = new Date(today);
+            d.setDate(d.getDate() - i);
+            const key = dateKey(d);
+            const entries = history[key] || [];
+
+            const dayWrap = document.createElement("div");
+            dayWrap.style.marginBottom = "14px";
+
+            const dayLabel = document.createElement("div");
+            dayLabel.className = "history-date";
+            dayLabel.style.marginBottom = "4px";
+            dayLabel.textContent =
+              fmtShort(d) +
+              (entries.length > 1 ? ` · ${entries.length} entries` : "");
+            dayWrap.appendChild(dayLabel);
+
+            if (entries.length === 0) {
+              const row = document.createElement("div");
+              row.className = "history-row";
+              row.innerHTML = `<div></div><div class="history-dot" style="border:1.5px solid var(--rule)"></div><div class="history-note empty">no entry</div>`;
+              dayWrap.appendChild(row);
+            } else {
+              entries.forEach((entry) => {
+                const moodDef = MOODS.find((m) => m.key === entry.mood);
+                const row = document.createElement("div");
+                row.className = "history-row";
+                row.style.gridTemplateColumns = "60px 14px 1fr";
+
+                const timeEl = document.createElement("div");
+                timeEl.className = "history-date";
+                timeEl.textContent = entry.time;
+
+                const dotEl = document.createElement("div");
+                dotEl.className = "history-dot";
+                dotEl.style.background = moodDef.color;
+
+                const bodyEl = document.createElement("div");
+                bodyEl.className = "history-body";
+                const energyDef = entry.energy
+                  ? ENERGY.find((en) => en.key === entry.energy)
+                  : null;
+                const label = energyDef
+                  ? `${moodDef.label} · ${energyDef.label}`
+                  : moodDef.label;
+                const tagsHtml =
+                  entry.tags && entry.tags.length
+                    ? `<div class="history-tags">${entry.tags.map((t) => `<span>${escapeHtml(t)}</span>`).join("")}</div>`
+                    : "";
+                const noteHtml = entry.note
+                  ? `<div class="history-note">${escapeHtml(entry.note)}</div>`
+                  : `<div class="history-note empty">${label}</div>`;
+                bodyEl.innerHTML = tagsHtml + noteHtml;
+
+                const deleteBtn = document.createElement("button");
+                deleteBtn.className = "entry-delete";
+                deleteBtn.dataset.id = entry.id;
+                deleteBtn.textContent = "delete";
+
+                row.style.gridTemplateColumns = "60px 14px 1fr auto";
+                row.appendChild(timeEl);
+                row.appendChild(dotEl);
+                row.appendChild(bodyEl);
+                row.appendChild(deleteBtn);
+                dayWrap.appendChild(row);
+              });
+            }
+            container.appendChild(dayWrap);
+          }
+        }
+
         renderStreak();
         renderTodayEntries();
         renderHistory();
-      }, (err) => {
-        console.error("Firestore listen failed", err);
-      });
 
-      const mpRef = collection(db, "users", user.uid, "mpEntries");
-      const mpQ = query(mpRef, orderBy("dateKey", "desc"), orderBy("time", "desc"));
-      unsubscribeMP = onSnapshot(mpQ, (snapshot) => {
-        mpEntries = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderMPTable();
-      }, (err) => {
-        console.error("MP Firestore listen failed", err);
-      });
+        // ---- tab switching ----
+        document
+          .querySelectorAll("nav.tabs .tab[data-panel]")
+          .forEach((tabEl) => {
+            tabEl.addEventListener("click", () => {
+              document
+                .querySelectorAll("nav.tabs .tab[data-panel]")
+                .forEach((t) => t.classList.remove("active"));
+              tabEl.classList.add("active");
+              document
+                .querySelectorAll(".tab-panel")
+                .forEach((p) => (p.style.display = "none"));
+              document.getElementById(
+                "panel-" + tabEl.dataset.panel,
+              ).style.display = "block";
+            });
+          });
 
-      const todosRef = collection(db, "users", user.uid, "todos");
-      const todosQ = query(todosRef, orderBy("dueDate", "asc"), orderBy("dueTime", "asc"));
-      unsubscribeTodos = onSnapshot(todosQ, (snapshot) => {
-        todos = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderTodos();
-      }, (err) => {
-        console.error("Todos Firestore listen failed", err);
-      });
-    } else {
-      document.getElementById("signin-gate").style.display = "flex";
-      document.getElementById("root").style.display = "none";
-    }
-  });
+        // ================= M/P Diary =================
+        const DAY_NAMES = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
+        function dayNameFromKey(key) {
+          const [y, m, d] = key.split("-").map(Number);
+          return DAY_NAMES[new Date(y, m - 1, d).getDay()];
+        }
+        function nowTimeStr(d) {
+          return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+        function fmtTimeDisplay(timeStr) {
+          if (!timeStr) return "";
+          const [h, m] = timeStr.split(":").map(Number);
+          const d = new Date();
+          d.setHours(h, m, 0, 0);
+          return fmtTime(d);
+        }
 
-  async function deleteMoodEntry(id) {
-    if (!currentUser || !id) return;
-    if (!confirm("Delete this entry? This can't be undone.")) return;
-    try {
-      await deleteDoc(doc(db, "users", currentUser.uid, "entries", id));
-    } catch (err) {
-      alert("Couldn't delete: " + err.message);
-    }
-  }
-  async function deleteMPEntry(id) {
-    if (!currentUser || !id) return;
-    if (!confirm("Delete this entry? This can't be undone.")) return;
-    try {
-      await deleteDoc(doc(db, "users", currentUser.uid, "mpEntries", id));
-    } catch (err) {
-      alert("Couldn't delete: " + err.message);
-    }
-  }
-  // event delegation so re-rendered rows keep working without re-attaching listeners
-  document.getElementById("today-entries").addEventListener("click", (e) => {
-    const btn = e.target.closest(".entry-delete");
-    if (btn) deleteMoodEntry(btn.dataset.id);
-  });
-  document.getElementById("history-list").addEventListener("click", (e) => {
-    const btn = e.target.closest(".entry-delete");
-    if (btn) deleteMoodEntry(btn.dataset.id);
-  });
-  document.getElementById("mp-table-body").addEventListener("click", (e) => {
-    const btn = e.target.closest(".entry-delete");
-    if (btn) deleteMPEntry(btn.dataset.id);
-  });
+        const mpDateInput = document.getElementById("mp-date");
+        const mpTimeInput = document.getElementById("mp-time");
+        mpDateInput.value = todayKey;
+        mpTimeInput.value = nowTimeStr(new Date());
 
-  let selectedMood = null;
-  let selectedEnergy = null;
-  let selectedTags = new Set();
-
-  // ---- mood scale ----
-  const scaleEl = document.getElementById("mood-scale");
-  MOODS.forEach(m => {
-    const opt = document.createElement("div");
-    opt.className = "mood-opt";
-    opt.dataset.key = m.key;
-    opt.innerHTML = `<div class="dot" style="background:${m.color}"></div>${m.label}`;
-    opt.addEventListener("click", () => {
-      selectedMood = m.key;
-      renderScale();
-      updateSaveState();
-    });
-    scaleEl.appendChild(opt);
-  });
-  function renderScale() {
-    document.querySelectorAll("#mood-scale .mood-opt").forEach(el => {
-      el.classList.toggle("selected", el.dataset.key === selectedMood);
-    });
-  }
-
-  // ---- energy scale (optional) ----
-  const energyEl = document.getElementById("energy-scale");
-  ENERGY.forEach(en => {
-    const opt = document.createElement("div");
-    opt.className = "mood-opt";
-    opt.dataset.key = en.key;
-    opt.innerHTML = `<div class="dot" style="background:${en.color}"></div>${en.label}`;
-    opt.addEventListener("click", () => {
-      selectedEnergy = selectedEnergy === en.key ? null : en.key;
-      renderEnergyScale();
-    });
-    energyEl.appendChild(opt);
-  });
-  function renderEnergyScale() {
-    document.querySelectorAll("#energy-scale .mood-opt").forEach(el => {
-      el.classList.toggle("selected", el.dataset.key === selectedEnergy);
-    });
-  }
-
-  // ---- tags ----
-  const tagRow = document.getElementById("tag-row");
-  TAGS.forEach(t => {
-    const chip = document.createElement("div");
-    chip.className = "tag-chip";
-    chip.textContent = t;
-    chip.addEventListener("click", () => {
-      if (selectedTags.has(t)) selectedTags.delete(t); else selectedTags.add(t);
-      chip.classList.toggle("selected");
-    });
-    tagRow.appendChild(chip);
-  });
-
-  function updateSaveState() {
-    document.getElementById("save-btn").disabled = !selectedMood;
-  }
-
-  document.getElementById("save-btn").addEventListener("click", async () => {
-    if (!selectedMood || !currentUser) return;
-    const now = new Date();
-    const entriesRef = collection(db, "users", currentUser.uid, "entries");
-    const btn = document.getElementById("save-btn");
-    btn.disabled = true;
-    try {
-      await addDoc(entriesRef, {
-        dateKey: todayKey,
-        time: fmtTime(now),
-        mood: selectedMood,
-        energy: selectedEnergy,
-        tags: Array.from(selectedTags),
-        note: document.getElementById("mood-note").value.trim(),
-        createdAt: serverTimestamp(),
-      });
-
-      // reset the entry form for the next check-in
-      selectedMood = null;
-      selectedEnergy = null;
-      selectedTags = new Set();
-      document.querySelectorAll(".tag-chip.selected").forEach(el => el.classList.remove("selected"));
-      document.getElementById("mood-note").value = "";
-      renderScale();
-      renderEnergyScale();
-
-      const flag = document.getElementById("saved-flag");
-      flag.classList.add("show");
-      setTimeout(() => flag.classList.remove("show"), 1500);
-      // renderStreak/renderTodayEntries/renderHistory fire automatically via the Firestore listener
-    } catch (err) {
-      alert("Couldn't save: " + err.message);
-    } finally {
-      updateSaveState();
-    }
-  });
-
-  // ---- streak (a day counts if it has at least one entry) ----
-  function renderStreak() {
-    let streak = 0;
-    let cursor = new Date(today);
-    while (true) {
-      const key = dateKey(cursor);
-      if (history[key] && history[key].length > 0) {
-        streak++;
-        cursor.setDate(cursor.getDate() - 1);
-      } else {
-        break;
-      }
-    }
-    const el = document.getElementById("streak-line");
-    if (streak === 0) {
-      el.innerHTML = `No streak yet today — log your mood to start one.`;
-    } else {
-      el.innerHTML = `<span class="streak-num">${streak}</span> day${streak === 1 ? "" : "s"} logged in a row`;
-    }
-  }
-
-  // ---- today's entries so far ----
-  function renderTodayEntries() {
-    const container = document.getElementById("today-entries");
-    const entries = history[todayKey] || [];
-    if (entries.length === 0) {
-      container.innerHTML = "";
-      return;
-    }
-    container.innerHTML = `<div class="sub" style="margin-bottom:8px;">Logged today (${entries.length})</div>` +
-      entries.map(e => {
-        const moodDef = MOODS.find(m => m.key === e.mood);
-        const energyDef = e.energy ? ENERGY.find(en => en.key === e.energy) : null;
-        const label = energyDef ? `${moodDef.label} · ${energyDef.label}` : moodDef.label;
-        const tagsHtml = e.tags && e.tags.length
-          ? `<div class="history-tags">${e.tags.map(t => `<span>${t}</span>`).join("")}</div>` : "";
-        return `<div class="history-row" style="grid-template-columns:60px 14px 1fr auto;">
-            <div class="history-date">${e.time}</div>
-            <div class="history-dot" style="background:${moodDef.color}"></div>
-            <div class="history-body">${tagsHtml}<div class="history-note${e.note ? "" : " empty"}">${e.note || label}</div></div>
-            <button class="entry-delete" data-id="${e.id}">delete</button>
-          </div>`;
-      }).join("");
-  }
-
-  // ---- history list (grouped by day, most recent first) ----
-  function renderHistory() {
-    const container = document.getElementById("history-list");
-    container.innerHTML = "";
-    for (let i = 0; i < 10; i++) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      const key = dateKey(d);
-      const entries = history[key] || [];
-
-      const dayWrap = document.createElement("div");
-      dayWrap.style.marginBottom = "14px";
-
-      const dayLabel = document.createElement("div");
-      dayLabel.className = "history-date";
-      dayLabel.style.marginBottom = "4px";
-      dayLabel.textContent = fmtShort(d) + (entries.length > 1 ? ` · ${entries.length} entries` : "");
-      dayWrap.appendChild(dayLabel);
-
-      if (entries.length === 0) {
-        const row = document.createElement("div");
-        row.className = "history-row";
-        row.innerHTML = `<div></div><div class="history-dot" style="border:1.5px solid var(--rule)"></div><div class="history-note empty">no entry</div>`;
-        dayWrap.appendChild(row);
-      } else {
-        entries.forEach(entry => {
-          const moodDef = MOODS.find(m => m.key === entry.mood);
-          const row = document.createElement("div");
-          row.className = "history-row";
-          row.style.gridTemplateColumns = "60px 14px 1fr";
-
-          const timeEl = document.createElement("div");
-          timeEl.className = "history-date";
-          timeEl.textContent = entry.time;
-
-          const dotEl = document.createElement("div");
-          dotEl.className = "history-dot";
-          dotEl.style.background = moodDef.color;
-
-          const bodyEl = document.createElement("div");
-          bodyEl.className = "history-body";
-          const energyDef = entry.energy ? ENERGY.find(en => en.key === entry.energy) : null;
-          const label = energyDef ? `${moodDef.label} · ${energyDef.label}` : moodDef.label;
-          const tagsHtml = entry.tags && entry.tags.length
-            ? `<div class="history-tags">${entry.tags.map(t => `<span>${t}</span>`).join("")}</div>` : "";
-          const noteHtml = entry.note
-            ? `<div class="history-note">${entry.note}</div>`
-            : `<div class="history-note empty">${label}</div>`;
-          bodyEl.innerHTML = tagsHtml + noteHtml;
-
-          const deleteBtn = document.createElement("button");
-          deleteBtn.className = "entry-delete";
-          deleteBtn.dataset.id = entry.id;
-          deleteBtn.textContent = "delete";
-
-          row.style.gridTemplateColumns = "60px 14px 1fr auto";
-          row.appendChild(timeEl);
-          row.appendChild(dotEl);
-          row.appendChild(bodyEl);
-          row.appendChild(deleteBtn);
-          dayWrap.appendChild(row);
+        const mpMasterySlider = document.getElementById("mp-mastery");
+        const mpPleasureSlider = document.getElementById("mp-pleasure");
+        mpMasterySlider.addEventListener("input", () => {
+          document.getElementById("mp-mastery-val").textContent =
+            mpMasterySlider.value;
         });
-      }
-      container.appendChild(dayWrap);
-    }
-  }
+        mpPleasureSlider.addEventListener("input", () => {
+          document.getElementById("mp-pleasure-val").textContent =
+            mpPleasureSlider.value;
+        });
 
-  renderStreak();
-  renderTodayEntries();
-  renderHistory();
+        document
+          .getElementById("mp-save-btn")
+          .addEventListener("click", async () => {
+            if (!currentUser) return;
+            const activity = document
+              .getElementById("mp-activity")
+              .value.trim();
+            if (!activity) {
+              alert("Add a short description of the activity.");
+              return;
+            }
+            const dateVal = mpDateInput.value || todayKey;
+            const timeVal = mpTimeInput.value || nowTimeStr(new Date());
+            const btn = document.getElementById("mp-save-btn");
+            btn.disabled = true;
+            try {
+              await addDoc(
+                collection(db, "users", currentUser.uid, "mpEntries"),
+                {
+                  dateKey: dateVal,
+                  day: dayNameFromKey(dateVal),
+                  time: timeVal,
+                  activity: activity,
+                  mastery: Number(mpMasterySlider.value),
+                  pleasure: Number(mpPleasureSlider.value),
+                  createdAt: serverTimestamp(),
+                },
+              );
+              document.getElementById("mp-activity").value = "";
+              mpMasterySlider.value = 5;
+              mpPleasureSlider.value = 5;
+              document.getElementById("mp-mastery-val").textContent = "5";
+              document.getElementById("mp-pleasure-val").textContent = "5";
+              mpDateInput.value = todayKey;
+              mpTimeInput.value = nowTimeStr(new Date());
+              const flag = document.getElementById("mp-saved-flag");
+              flag.classList.add("show");
+              setTimeout(() => flag.classList.remove("show"), 1500);
+            } catch (err) {
+              alert("Couldn't save: " + err.message);
+            } finally {
+              btn.disabled = false;
+            }
+          });
 
-  // ---- tab switching ----
-  document.querySelectorAll("nav.tabs .tab[data-panel]").forEach(tabEl => {
-    tabEl.addEventListener("click", () => {
-      document.querySelectorAll("nav.tabs .tab[data-panel]").forEach(t => t.classList.remove("active"));
-      tabEl.classList.add("active");
-      document.querySelectorAll(".tab-panel").forEach(p => p.style.display = "none");
-      document.getElementById("panel-" + tabEl.dataset.panel).style.display = "block";
-    });
-  });
-
-  // ================= M/P Diary =================
-  const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  function dayNameFromKey(key) {
-    const [y, m, d] = key.split("-").map(Number);
-    return DAY_NAMES[new Date(y, m - 1, d).getDay()];
-  }
-  function nowTimeStr(d) { return `${pad(d.getHours())}:${pad(d.getMinutes())}`; }
-  function fmtTimeDisplay(timeStr) {
-    if (!timeStr) return "";
-    const [h, m] = timeStr.split(":").map(Number);
-    const d = new Date(); d.setHours(h, m, 0, 0);
-    return fmtTime(d);
-  }
-
-  const mpDateInput = document.getElementById("mp-date");
-  const mpTimeInput = document.getElementById("mp-time");
-  mpDateInput.value = todayKey;
-  mpTimeInput.value = nowTimeStr(new Date());
-
-  const mpMasterySlider = document.getElementById("mp-mastery");
-  const mpPleasureSlider = document.getElementById("mp-pleasure");
-  mpMasterySlider.addEventListener("input", () => {
-    document.getElementById("mp-mastery-val").textContent = mpMasterySlider.value;
-  });
-  mpPleasureSlider.addEventListener("input", () => {
-    document.getElementById("mp-pleasure-val").textContent = mpPleasureSlider.value;
-  });
-
-  document.getElementById("mp-save-btn").addEventListener("click", async () => {
-    if (!currentUser) return;
-    const activity = document.getElementById("mp-activity").value.trim();
-    if (!activity) { alert("Add a short description of the activity."); return; }
-    const dateVal = mpDateInput.value || todayKey;
-    const timeVal = mpTimeInput.value || nowTimeStr(new Date());
-    const btn = document.getElementById("mp-save-btn");
-    btn.disabled = true;
-    try {
-      await addDoc(collection(db, "users", currentUser.uid, "mpEntries"), {
-        dateKey: dateVal,
-        day: dayNameFromKey(dateVal),
-        time: timeVal,
-        activity: activity,
-        mastery: Number(mpMasterySlider.value),
-        pleasure: Number(mpPleasureSlider.value),
-        createdAt: serverTimestamp(),
-      });
-      document.getElementById("mp-activity").value = "";
-      mpMasterySlider.value = 5; mpPleasureSlider.value = 5;
-      document.getElementById("mp-mastery-val").textContent = "5";
-      document.getElementById("mp-pleasure-val").textContent = "5";
-      mpDateInput.value = todayKey;
-      mpTimeInput.value = nowTimeStr(new Date());
-      const flag = document.getElementById("mp-saved-flag");
-      flag.classList.add("show");
-      setTimeout(() => flag.classList.remove("show"), 1500);
-    } catch (err) {
-      alert("Couldn't save: " + err.message);
-    } finally {
-      btn.disabled = false;
-    }
-  });
-
-  function renderMPTable() {
-    const tbody = document.getElementById("mp-table-body");
-    const emptyEl = document.getElementById("mp-empty");
-    tbody.innerHTML = "";
-    if (mpEntries.length === 0) {
-      emptyEl.style.display = "block";
-      return;
-    }
-    emptyEl.style.display = "none";
-    mpEntries.forEach(e => {
-      const tr = document.createElement("tr");
-      tr.style.borderBottom = "1px solid var(--rule)";
-      tr.innerHTML = `
-        <td style="padding:7px 8px; color:var(--ink-soft);">${e.dateKey}</td>
-        <td style="padding:7px 8px; color:var(--ink-soft);">${e.day || dayNameFromKey(e.dateKey)}</td>
+        function renderMPTable() {
+          const tbody = document.getElementById("mp-table-body");
+          const emptyEl = document.getElementById("mp-empty");
+          tbody.innerHTML = "";
+          if (mpEntries.length === 0) {
+            emptyEl.style.display = "block";
+            return;
+          }
+          emptyEl.style.display = "none";
+          mpEntries.forEach((e) => {
+            const tr = document.createElement("tr");
+            tr.style.borderBottom = "1px solid var(--rule)";
+            tr.innerHTML = `
+        <td style="padding:7px 8px; color:var(--ink-soft);">${escapeHtml(e.dateKey)}</td>
+        <td style="padding:7px 8px; color:var(--ink-soft);">${escapeHtml(e.day || dayNameFromKey(e.dateKey))}</td>
         <td style="padding:7px 8px; color:var(--ink-soft);">${fmtTimeDisplay(e.time)}</td>
-        <td style="padding:7px 8px;">${e.activity}</td>
-        <td style="padding:7px 8px; text-align:center; font-weight:600;">${e.mastery}</td>
-        <td style="padding:7px 8px; text-align:center; font-weight:600; color:var(--good);">${e.pleasure}</td>
+        <td style="padding:7px 8px;">${escapeHtml(e.activity)}</td>
+        <td style="padding:7px 8px; text-align:center; font-weight:600;">${escapeHtml(e.mastery)}</td>
+        <td style="padding:7px 8px; text-align:center; font-weight:600; color:var(--good);">${escapeHtml(e.pleasure)}</td>
         <td style="padding:7px 8px;"><button class="entry-delete" data-id="${e.id}">delete</button></td>
       `;
-      tbody.appendChild(tr);
-    });
-  }
-
-  // ---- import from pasted spreadsheet rows ----
-  document.getElementById("mp-import-toggle").addEventListener("click", () => {
-    const panel = document.getElementById("mp-import-panel");
-    panel.style.display = panel.style.display === "none" ? "block" : "none";
-  });
-
-  function parseImportDate(raw) {
-    raw = raw.trim();
-    // Accept YYYY-MM-DD directly
-    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
-    // Accept things like 9/5/2026 or 09/05/2026
-    const m = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-    if (m) return `${m[3]}-${pad(Number(m[1]))}-${pad(Number(m[2]))}`;
-    return null;
-  }
-  function parseImportTime(raw) {
-    raw = raw.trim();
-    if (/^\d{1,2}:\d{2}$/.test(raw)) {
-      const [h, m] = raw.split(":");
-      return `${pad(Number(h))}:${pad(Number(m))}`;
-    }
-    // Accept "7:30 AM" style
-    const m = raw.match(/^(\d{1,2}):(\d{2})\s*([AaPp][Mm])$/);
-    if (m) {
-      let h = Number(m[1]) % 12;
-      if (/pm/i.test(m[3])) h += 12;
-      return `${pad(h)}:${pad(Number(m[2]))}`;
-    }
-    return "12:00";
-  }
-
-  document.getElementById("mp-import-btn").addEventListener("click", async () => {
-    if (!currentUser) return;
-    const raw = document.getElementById("mp-import-text").value;
-    const lines = raw.split("\n").map(l => l.trim()).filter(l => l.length > 0);
-    if (lines.length === 0) return;
-
-    const rows = [];
-    const errors = [];
-    lines.forEach((line, i) => {
-      const cols = line.split("\t");
-      if (cols.length < 6) { errors.push(`Line ${i + 1}: expected 6 tab-separated columns, got ${cols.length}`); return; }
-      const [rawDate, , rawTime, activity, rawMastery, rawPleasure] = cols; // skip Day column, we recompute it
-      const dateKey_ = parseImportDate(rawDate);
-      if (!dateKey_) { errors.push(`Line ${i + 1}: couldn't read date "${rawDate}"`); return; }
-      const mastery = Number(rawMastery);
-      const pleasure = Number(rawPleasure);
-      if (Number.isNaN(mastery) || Number.isNaN(pleasure)) { errors.push(`Line ${i + 1}: mastery/pleasure not numbers`); return; }
-      rows.push({
-        dateKey: dateKey_,
-        day: dayNameFromKey(dateKey_),
-        time: parseImportTime(rawTime),
-        activity: activity.trim(),
-        mastery, pleasure,
-      });
-    });
-
-    if (errors.length > 0) {
-      alert("Some rows couldn't be read:\n" + errors.slice(0, 5).join("\n") + (errors.length > 5 ? `\n...and ${errors.length - 5} more` : ""));
-      if (rows.length === 0) return;
-    }
-
-    const btn = document.getElementById("mp-import-btn");
-    btn.disabled = true;
-    try {
-      // Firestore batches cap at 500 writes; chunk just in case
-      for (let i = 0; i < rows.length; i += 400) {
-        const batch = writeBatch(db);
-        rows.slice(i, i + 400).forEach(r => {
-          const ref = doc(collection(db, "users", currentUser.uid, "mpEntries"));
-          batch.set(ref, { ...r, createdAt: serverTimestamp() });
-        });
-        await batch.commit();
-      }
-      document.getElementById("mp-import-text").value = "";
-      const flag = document.getElementById("mp-import-flag");
-      flag.classList.add("show");
-      setTimeout(() => flag.classList.remove("show"), 2000);
-    } catch (err) {
-      alert("Import failed: " + err.message);
-    } finally {
-      btn.disabled = false;
-    }
-  });
-
-  // ================= To-Do =================
-  const PRIORITY_COLORS = { 1: "#8B4A3F", 2: "var(--accent)", 3: "var(--low)", 4: "var(--rule)" };
-  const WEEKDAY_NAMES = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-
-  function addDays(dateKeyStr, n) {
-    const [y, m, d] = dateKeyStr.split("-").map(Number);
-    const dt = new Date(y, m - 1, d);
-    dt.setDate(dt.getDate() + n);
-    return dateKey(dt);
-  }
-  function addMonths(dateKeyStr, n) {
-    const [y, m, d] = dateKeyStr.split("-").map(Number);
-    const dt = new Date(y, m - 1, d);
-    dt.setMonth(dt.getMonth() + n);
-    return dateKey(dt);
-  }
-
-  // lightweight natural-language parser: pulls date/time/priority/recurrence
-  // tokens out of free text and returns the cleaned title plus the parsed fields.
-  function parseQuickAdd(raw) {
-    let text = " " + raw.trim() + " ";
-    const result = {
-      dateKey: todayKey,
-      time: null,
-      priority: 4,
-      recurrence: "none",
-    };
-
-    // recurrence
-    if (/\b(every day|daily)\b/i.test(text)) { result.recurrence = "daily"; text = text.replace(/\b(every day|daily)\b/i, " "); }
-    else if (/\b(every week|weekly)\b/i.test(text)) { result.recurrence = "weekly"; text = text.replace(/\b(every week|weekly)\b/i, " "); }
-    else if (/\b(every month|monthly)\b/i.test(text)) { result.recurrence = "monthly"; text = text.replace(/\b(every month|monthly)\b/i, " "); }
-
-    // priority: p1-p4
-    const pMatch = text.match(/\bp([1-4])\b/i);
-    if (pMatch) { result.priority = Number(pMatch[1]); text = text.replace(pMatch[0], " "); }
-
-    // time: "3pm", "3:30pm", "15:00", "at 9"
-    // scan ALL number-ish candidates and use the first one that actually looks like
-    // a time (has a colon or am/pm) — a bare digit elsewhere in the text (like in
-    // "test 1" or "in 3 days") must not stop the search early.
-    const timeCandidates = [...text.matchAll(/\b(?:at\s+)?(\d{1,2})(:(\d{2}))?\s*(am|pm)?\b/gi)];
-    const timeMatch = timeCandidates.find(m => m[4] || m[2]);
-    if (timeMatch) {
-      let h = Number(timeMatch[1]);
-      const min = timeMatch[3] ? Number(timeMatch[3]) : 0;
-      if (timeMatch[4]) {
-        if (/pm/i.test(timeMatch[4]) && h < 12) h += 12;
-        if (/am/i.test(timeMatch[4]) && h === 12) h = 0;
-      }
-      if (h <= 23 && min <= 59) {
-        result.time = `${pad(h)}:${pad(min)}`;
-        text = text.replace(timeMatch[0], " ");
-      }
-    }
-
-    // date: today / tomorrow / weekday name / "in N days"
-    if (/\btoday\b/i.test(text)) { result.dateKey = todayKey; text = text.replace(/\btoday\b/i, " "); }
-    else if (/\btomorrow\b/i.test(text)) { result.dateKey = addDays(todayKey, 1); text = text.replace(/\btomorrow\b/i, " "); }
-    else {
-      const inDaysMatch = text.match(/\bin (\d+) days?\b/i);
-      if (inDaysMatch) {
-        result.dateKey = addDays(todayKey, Number(inDaysMatch[1]));
-        text = text.replace(inDaysMatch[0], " ");
-      } else {
-        const wdMatch = text.match(/\b(next\s+)?(sunday|monday|tuesday|wednesday|thursday|friday|saturday)\b/i);
-        if (wdMatch) {
-          const targetIdx = WEEKDAY_NAMES.indexOf(wdMatch[2].toLowerCase());
-          const [ty, tm, td] = todayKey.split("-").map(Number);
-          const todayIdx = new Date(ty, tm - 1, td).getDay();
-          let diff = (targetIdx - todayIdx + 7) % 7;
-          if (diff === 0 || wdMatch[1]) diff += (diff === 0 ? 7 : 0); // "next" or same-day-name pushes to next week
-          result.dateKey = addDays(todayKey, diff);
-          text = text.replace(wdMatch[0], " ");
+            tbody.appendChild(tr);
+          });
         }
-      }
-    }
 
-    result.title = text.replace(/\s+/g, " ").trim();
-    return result;
-  }
+        // ---- import from pasted spreadsheet rows ----
+        document
+          .getElementById("mp-import-toggle")
+          .addEventListener("click", () => {
+            const panel = document.getElementById("mp-import-panel");
+            panel.style.display =
+              panel.style.display === "none" ? "block" : "none";
+          });
 
-  function updateParsePreview() {
-    const raw = document.getElementById("todo-quickadd").value;
-    const previewEl = document.getElementById("todo-parse-preview");
-    if (!raw.trim()) { previewEl.textContent = ""; return; }
-    const parsed = parseQuickAdd(raw);
-    const parts = [];
-    parts.push(parsed.dateKey === todayKey ? "Today" : fmtShort(new Date(...parsed.dateKey.split("-").map((v,i)=>i===1?v-1:Number(v)))));
-    if (parsed.time) parts.push(parsed.time);
-    if (parsed.priority < 4) parts.push("p" + parsed.priority);
-    if (parsed.recurrence !== "none") parts.push(parsed.recurrence);
-    previewEl.textContent = `→ "${parsed.title || "(untitled)"}" · ${parts.join(" · ")}`;
+        function parseImportDate(raw) {
+          raw = raw.trim();
+          // Accept YYYY-MM-DD directly
+          if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+          // Accept things like 9/5/2026 or 09/05/2026
+          const m = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+          if (m) return `${m[3]}-${pad(Number(m[1]))}-${pad(Number(m[2]))}`;
+          return null;
+        }
+        function parseImportTime(raw) {
+          raw = raw.trim();
+          if (/^\d{1,2}:\d{2}$/.test(raw)) {
+            const [h, m] = raw.split(":");
+            return `${pad(Number(h))}:${pad(Number(m))}`;
+          }
+          // Accept "7:30 AM" style
+          const m = raw.match(/^(\d{1,2}):(\d{2})\s*([AaPp][Mm])$/);
+          if (m) {
+            let h = Number(m[1]) % 12;
+            if (/pm/i.test(m[3])) h += 12;
+            return `${pad(h)}:${pad(Number(m[2]))}`;
+          }
+          return "12:00";
+        }
 
-    // keep the manual fields in sync so "Adjust..." always shows the current parse
-    document.getElementById("todo-date").value = parsed.dateKey;
-    document.getElementById("todo-time").value = parsed.time || "09:00";
-    document.getElementById("todo-priority").value = String(parsed.priority);
-    document.getElementById("todo-recurrence").value = parsed.recurrence;
-  }
-  document.getElementById("todo-quickadd").addEventListener("input", updateParsePreview);
-  document.getElementById("todo-quickadd").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") document.getElementById("todo-add-btn").click();
-  });
+        document
+          .getElementById("mp-import-btn")
+          .addEventListener("click", async () => {
+            if (!currentUser) return;
+            const raw = document.getElementById("mp-import-text").value;
+            const lines = raw
+              .split("\n")
+              .map((l) => l.trim())
+              .filter((l) => l.length > 0);
+            if (lines.length === 0) return;
 
-  document.getElementById("todo-more-toggle").addEventListener("click", () => {
-    const panel = document.getElementById("todo-more-panel");
-    panel.style.display = panel.style.display === "none" ? "flex" : "none";
-  });
+            const rows = [];
+            const errors = [];
+            lines.forEach((line, i) => {
+              const cols = line.split("\t");
+              if (cols.length < 6) {
+                errors.push(
+                  `Line ${i + 1}: expected 6 tab-separated columns, got ${cols.length}`,
+                );
+                return;
+              }
+              const [rawDate, , rawTime, activity, rawMastery, rawPleasure] =
+                cols; // skip Day column, we recompute it
+              const dateKey_ = parseImportDate(rawDate);
+              if (!dateKey_) {
+                errors.push(`Line ${i + 1}: couldn't read date "${rawDate}"`);
+                return;
+              }
+              const mastery = Number(rawMastery);
+              const pleasure = Number(rawPleasure);
+              if (Number.isNaN(mastery) || Number.isNaN(pleasure)) {
+                errors.push(`Line ${i + 1}: mastery/pleasure not numbers`);
+                return;
+              }
+              rows.push({
+                dateKey: dateKey_,
+                day: dayNameFromKey(dateKey_),
+                time: parseImportTime(rawTime),
+                activity: activity.trim(),
+                mastery,
+                pleasure,
+              });
+            });
 
-  document.getElementById("todo-add-btn").addEventListener("click", async () => {
-    if (!currentUser) return;
-    const rawInput = document.getElementById("todo-quickadd");
-    const raw = rawInput.value.trim();
-    if (!raw) return;
-    const parsed = parseQuickAdd(raw);
-    // manual fields (visible or not) always reflect the latest state and win if the
-    // person tweaked them after the auto-parse, so read from them at submit time
-    const finalDate = document.getElementById("todo-date").value || parsed.dateKey;
-    const finalTime = document.getElementById("todo-time").value || parsed.time || "09:00";
-    const finalPriority = Number(document.getElementById("todo-priority").value || parsed.priority);
-    const finalRecurrence = document.getElementById("todo-recurrence").value || parsed.recurrence;
-    const title = parsed.title || raw;
+            if (errors.length > 0) {
+              alert(
+                "Some rows couldn't be read:\n" +
+                  errors.slice(0, 5).join("\n") +
+                  (errors.length > 5
+                    ? `\n...and ${errors.length - 5} more`
+                    : ""),
+              );
+              if (rows.length === 0) return;
+            }
 
-    const btn = document.getElementById("todo-add-btn");
-    btn.disabled = true;
-    try {
-      await addDoc(collection(db, "users", currentUser.uid, "todos"), {
-        title,
-        dueDate: finalDate,
-        dueTime: finalTime,
-        priority: finalPriority,
-        recurrence: finalRecurrence,
-        completed: false,
-        createdAt: serverTimestamp(),
-      });
-      rawInput.value = "";
-      document.getElementById("todo-parse-preview").textContent = "";
-      document.getElementById("todo-more-panel").style.display = "none";
-    } catch (err) {
-      alert("Couldn't add task: " + err.message);
-    } finally {
-      btn.disabled = false;
-    }
-  });
+            const btn = document.getElementById("mp-import-btn");
+            btn.disabled = true;
+            try {
+              // Firestore batches cap at 500 writes; chunk just in case
+              for (let i = 0; i < rows.length; i += 400) {
+                const batch = writeBatch(db);
+                rows.slice(i, i + 400).forEach((r) => {
+                  const ref = doc(
+                    collection(db, "users", currentUser.uid, "mpEntries"),
+                  );
+                  batch.set(ref, { ...r, createdAt: serverTimestamp() });
+                });
+                await batch.commit();
+              }
+              document.getElementById("mp-import-text").value = "";
+              const flag = document.getElementById("mp-import-flag");
+              flag.classList.add("show");
+              setTimeout(() => flag.classList.remove("show"), 2000);
+            } catch (err) {
+              alert("Import failed: " + err.message);
+            } finally {
+              btn.disabled = false;
+            }
+          });
 
-  async function toggleTodoComplete(todo) {
-    if (!currentUser) return;
-    const ref = doc(db, "users", currentUser.uid, "todos", todo.id);
-    try {
-      if (todo.recurrence && todo.recurrence !== "none") {
-        // recurring: roll the due date forward instead of marking it done forever
-        let nextDate = todo.dueDate;
-        if (todo.recurrence === "daily") nextDate = addDays(todo.dueDate, 1);
-        else if (todo.recurrence === "weekly") nextDate = addDays(todo.dueDate, 7);
-        else if (todo.recurrence === "monthly") nextDate = addMonths(todo.dueDate, 1);
-        await updateDoc(ref, { dueDate: nextDate });
-      } else {
-        await updateDoc(ref, { completed: !todo.completed });
-      }
-    } catch (err) {
-      alert("Couldn't update: " + err.message);
-    }
-  }
-  async function deleteTodo(id) {
-    if (!currentUser || !id) return;
-    if (!confirm("Delete this task? This can't be undone.")) return;
-    try {
-      await deleteDoc(doc(db, "users", currentUser.uid, "todos", id));
-    } catch (err) {
-      alert("Couldn't delete: " + err.message);
-    }
-  }
+        // ================= To-Do =================
+        const PRIORITY_COLORS = {
+          1: "#8B4A3F",
+          2: "var(--accent)",
+          3: "var(--low)",
+          4: "var(--rule)",
+        };
+        const WEEKDAY_NAMES = [
+          "sunday",
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+        ];
 
-  function todoDueLabel(t) {
-    const cls = t.dueDate < todayKey ? "overdue" : (t.dueDate === todayKey ? "today" : "");
-    const dateLabel = t.dueDate === todayKey ? "Today" : fmtShort(new Date(...t.dueDate.split("-").map((v,i)=>i===1?v-1:Number(v))));
-    return `<span class="todo-due ${cls}">${dateLabel} ${fmtTimeDisplay(t.dueTime)}</span>`;
-  }
+        function addDays(dateKeyStr, n) {
+          const [y, m, d] = dateKeyStr.split("-").map(Number);
+          const dt = new Date(y, m - 1, d);
+          dt.setDate(dt.getDate() + n);
+          return dateKey(dt);
+        }
+        function addMonths(dateKeyStr, n) {
+          const [y, m, d] = dateKeyStr.split("-").map(Number);
+          const dt = new Date(y, m - 1, d);
+          dt.setMonth(dt.getMonth() + n);
+          return dateKey(dt);
+        }
 
-  function renderTodoRow(t) {
-    const recurLabel = t.recurrence && t.recurrence !== "none" ? `<span class="todo-recur">↻ ${t.recurrence}</span>` : "";
-    return `<div class="todo-row">
+        // lightweight natural-language parser: pulls date/time/priority/recurrence
+        // tokens out of free text and returns the cleaned title plus the parsed fields.
+        function parseQuickAdd(raw) {
+          let text = " " + raw.trim() + " ";
+          const result = {
+            dateKey: todayKey,
+            time: null,
+            priority: 4,
+            recurrence: "none",
+          };
+
+          // recurrence
+          if (/\b(every day|daily)\b/i.test(text)) {
+            result.recurrence = "daily";
+            text = text.replace(/\b(every day|daily)\b/i, " ");
+          } else if (/\b(every week|weekly)\b/i.test(text)) {
+            result.recurrence = "weekly";
+            text = text.replace(/\b(every week|weekly)\b/i, " ");
+          } else if (/\b(every month|monthly)\b/i.test(text)) {
+            result.recurrence = "monthly";
+            text = text.replace(/\b(every month|monthly)\b/i, " ");
+          }
+
+          // priority: p1-p4
+          const pMatch = text.match(/\bp([1-4])\b/i);
+          if (pMatch) {
+            result.priority = Number(pMatch[1]);
+            text = text.replace(pMatch[0], " ");
+          }
+
+          // time: "3pm", "3:30pm", "15:00", "at 9"
+          // scan ALL number-ish candidates and use the first one that actually looks like
+          // a time (has a colon or am/pm) — a bare digit elsewhere in the text (like in
+          // "test 1" or "in 3 days") must not stop the search early.
+          const timeCandidates = [
+            ...text.matchAll(/\b(?:at\s+)?(\d{1,2})(:(\d{2}))?\s*(am|pm)?\b/gi),
+          ];
+          const timeMatch = timeCandidates.find((m) => m[4] || m[2]);
+          if (timeMatch) {
+            let h = Number(timeMatch[1]);
+            const min = timeMatch[3] ? Number(timeMatch[3]) : 0;
+            if (timeMatch[4]) {
+              if (/pm/i.test(timeMatch[4]) && h < 12) h += 12;
+              if (/am/i.test(timeMatch[4]) && h === 12) h = 0;
+            }
+            if (h <= 23 && min <= 59) {
+              result.time = `${pad(h)}:${pad(min)}`;
+              text = text.replace(timeMatch[0], " ");
+            }
+          }
+
+          // date: today / tomorrow / weekday name / "in N days"
+          if (/\btoday\b/i.test(text)) {
+            result.dateKey = todayKey;
+            text = text.replace(/\btoday\b/i, " ");
+          } else if (/\btomorrow\b/i.test(text)) {
+            result.dateKey = addDays(todayKey, 1);
+            text = text.replace(/\btomorrow\b/i, " ");
+          } else {
+            const inDaysMatch = text.match(/\bin (\d+) days?\b/i);
+            if (inDaysMatch) {
+              result.dateKey = addDays(todayKey, Number(inDaysMatch[1]));
+              text = text.replace(inDaysMatch[0], " ");
+            } else {
+              const wdMatch = text.match(
+                /\b(next\s+)?(sunday|monday|tuesday|wednesday|thursday|friday|saturday)\b/i,
+              );
+              if (wdMatch) {
+                const targetIdx = WEEKDAY_NAMES.indexOf(
+                  wdMatch[2].toLowerCase(),
+                );
+                const [ty, tm, td] = todayKey.split("-").map(Number);
+                const todayIdx = new Date(ty, tm - 1, td).getDay();
+                let diff = (targetIdx - todayIdx + 7) % 7;
+                if (diff === 0 || wdMatch[1]) diff += diff === 0 ? 7 : 0; // "next" or same-day-name pushes to next week
+                result.dateKey = addDays(todayKey, diff);
+                text = text.replace(wdMatch[0], " ");
+              }
+            }
+          }
+
+          result.title = text.replace(/\s+/g, " ").trim();
+          return result;
+        }
+
+        function updateParsePreview() {
+          const raw = document.getElementById("todo-quickadd").value;
+          const previewEl = document.getElementById("todo-parse-preview");
+          if (!raw.trim()) {
+            previewEl.textContent = "";
+            return;
+          }
+          const parsed = parseQuickAdd(raw);
+          const parts = [];
+          parts.push(
+            parsed.dateKey === todayKey
+              ? "Today"
+              : fmtShort(
+                  new Date(
+                    ...parsed.dateKey
+                      .split("-")
+                      .map((v, i) => (i === 1 ? v - 1 : Number(v))),
+                  ),
+                ),
+          );
+          if (parsed.time) parts.push(parsed.time);
+          if (parsed.priority < 4) parts.push("p" + parsed.priority);
+          if (parsed.recurrence !== "none") parts.push(parsed.recurrence);
+          previewEl.textContent = `→ "${parsed.title || "(untitled)"}" · ${parts.join(" · ")}`;
+
+          // keep the manual fields in sync so "Adjust..." always shows the current parse
+          document.getElementById("todo-date").value = parsed.dateKey;
+          document.getElementById("todo-time").value = parsed.time || "09:00";
+          document.getElementById("todo-priority").value = String(
+            parsed.priority,
+          );
+          document.getElementById("todo-recurrence").value = parsed.recurrence;
+        }
+        document
+          .getElementById("todo-quickadd")
+          .addEventListener("input", updateParsePreview);
+        document
+          .getElementById("todo-quickadd")
+          .addEventListener("keydown", (e) => {
+            if (e.key === "Enter")
+              document.getElementById("todo-add-btn").click();
+          });
+
+        document
+          .getElementById("todo-more-toggle")
+          .addEventListener("click", () => {
+            const panel = document.getElementById("todo-more-panel");
+            panel.style.display =
+              panel.style.display === "none" ? "flex" : "none";
+          });
+
+        document
+          .getElementById("todo-add-btn")
+          .addEventListener("click", async () => {
+            if (!currentUser) return;
+            const rawInput = document.getElementById("todo-quickadd");
+            const raw = rawInput.value.trim();
+            if (!raw) return;
+            const parsed = parseQuickAdd(raw);
+            // manual fields (visible or not) always reflect the latest state and win if the
+            // person tweaked them after the auto-parse, so read from them at submit time
+            const finalDate =
+              document.getElementById("todo-date").value || parsed.dateKey;
+            const finalTime =
+              document.getElementById("todo-time").value ||
+              parsed.time ||
+              "09:00";
+            const finalPriority = Number(
+              document.getElementById("todo-priority").value || parsed.priority,
+            );
+            const finalRecurrence =
+              document.getElementById("todo-recurrence").value ||
+              parsed.recurrence;
+            const title = parsed.title || raw;
+
+            const btn = document.getElementById("todo-add-btn");
+            btn.disabled = true;
+            try {
+              await addDoc(collection(db, "users", currentUser.uid, "todos"), {
+                title,
+                dueDate: finalDate,
+                dueTime: finalTime,
+                priority: finalPriority,
+                recurrence: finalRecurrence,
+                completed: false,
+                createdAt: serverTimestamp(),
+              });
+              rawInput.value = "";
+              document.getElementById("todo-parse-preview").textContent = "";
+              document.getElementById("todo-more-panel").style.display = "none";
+            } catch (err) {
+              alert("Couldn't add task: " + err.message);
+            } finally {
+              btn.disabled = false;
+            }
+          });
+
+        async function toggleTodoComplete(todo) {
+          if (!currentUser) return;
+          const ref = doc(db, "users", currentUser.uid, "todos", todo.id);
+          try {
+            if (todo.recurrence && todo.recurrence !== "none") {
+              // recurring: roll the due date forward instead of marking it done forever
+              let nextDate = todo.dueDate;
+              if (todo.recurrence === "daily")
+                nextDate = addDays(todo.dueDate, 1);
+              else if (todo.recurrence === "weekly")
+                nextDate = addDays(todo.dueDate, 7);
+              else if (todo.recurrence === "monthly")
+                nextDate = addMonths(todo.dueDate, 1);
+              await updateDoc(ref, { dueDate: nextDate });
+            } else {
+              await updateDoc(ref, { completed: !todo.completed });
+            }
+          } catch (err) {
+            alert("Couldn't update: " + err.message);
+          }
+        }
+        async function deleteTodo(id) {
+          if (!currentUser || !id) return;
+          if (!confirm("Delete this task? This can't be undone.")) return;
+          try {
+            await deleteDoc(doc(db, "users", currentUser.uid, "todos", id));
+          } catch (err) {
+            alert("Couldn't delete: " + err.message);
+          }
+        }
+
+        function todoDueLabel(t) {
+          const cls =
+            t.dueDate < todayKey
+              ? "overdue"
+              : t.dueDate === todayKey
+                ? "today"
+                : "";
+          const dateLabel =
+            t.dueDate === todayKey
+              ? "Today"
+              : fmtShort(
+                  new Date(
+                    ...t.dueDate
+                      .split("-")
+                      .map((v, i) => (i === 1 ? v - 1 : Number(v))),
+                  ),
+                );
+          return `<span class="todo-due ${cls}">${dateLabel} ${fmtTimeDisplay(t.dueTime)}</span>`;
+        }
+
+        function renderTodoRow(t) {
+          const recurLabel =
+            t.recurrence && t.recurrence !== "none"
+              ? `<span class="todo-recur">↻ ${escapeHtml(t.recurrence)}</span>`
+              : "";
+          const done = !!t.completed;
+          const popClass = t._flashPop ? " pop" : "";
+          return `<div class="todo-row">
       <div class="todo-priority-bar" style="background:${PRIORITY_COLORS[t.priority] || PRIORITY_COLORS[4]};"></div>
-      <button class="todo-check${t.completed ? " done" : ""}" data-action="toggle" data-id="${t.id}"></button>
+      <button class="todo-check${done ? " done" : ""}${popClass}" data-action="toggle" data-id="${t.id}"></button>
       <div class="todo-main">
-        <div class="todo-title" style="${t.completed ? "text-decoration:line-through; color:var(--ink-soft);" : ""}">${t.title}</div>
+        <div class="todo-title" style="${done ? "text-decoration:line-through; color:var(--ink-soft);" : ""}">${escapeHtml(t.title)}</div>
         <div class="todo-meta">${todoDueLabel(t)}${recurLabel}</div>
       </div>
       <button class="entry-delete" data-action="delete" data-id="${t.id}">delete</button>
     </div>`;
-  }
+        }
 
-  function renderTodos() {
-    const overdueEl = document.getElementById("todo-list-overdue");
-    const todayEl = document.getElementById("todo-list-today");
-    const upcomingEl = document.getElementById("todo-list-upcoming");
-    const overdueSection = document.getElementById("todo-section-overdue");
-    const emptyEl = document.getElementById("todo-empty");
+        // Holds a frozen, forced-"done" copy of a task for a short window right after it's
+        // checked off, so the checkmark/strikethrough/pop are guaranteed to be visible for a
+        // moment even though Firestore may confirm the change (and trigger a re-render) almost
+        // instantly, and even though recurring tasks never actually end up with completed:true.
+        const flashSnapshots = new Map();
 
-    const active = todos.filter(t => !t.completed);
-    if (active.length === 0 && todos.length === 0) {
-      emptyEl.style.display = "block";
-    } else {
-      emptyEl.style.display = "none";
-    }
+        function renderTodos() {
+          const overdueEl = document.getElementById("todo-list-overdue");
+          const todayEl = document.getElementById("todo-list-today");
+          const upcomingEl = document.getElementById("todo-list-upcoming");
+          const overdueSection = document.getElementById(
+            "todo-section-overdue",
+          );
+          const emptyEl = document.getElementById("todo-empty");
 
-    const overdue = active.filter(t => t.dueDate < todayKey);
-    const today_ = active.filter(t => t.dueDate === todayKey);
-    const upcoming = active.filter(t => t.dueDate > todayKey);
+          // Real, current-state tasks, minus anything we're currently flashing as just-completed
+          // (those are injected back in from their frozen snapshot below instead).
+          const active = todos.filter(
+            (t) => !t.completed && !flashSnapshots.has(t.id),
+          );
+          if (active.length === 0 && todos.length === 0) {
+            emptyEl.style.display = "block";
+          } else {
+            emptyEl.style.display = "none";
+          }
 
-    overdueSection.style.display = overdue.length > 0 ? "block" : "none";
-    overdueEl.innerHTML = overdue.map(renderTodoRow).join("");
-    todayEl.innerHTML = today_.length > 0 ? today_.map(renderTodoRow).join("") : `<div class="todo-empty-section">Nothing due today.</div>`;
-    upcomingEl.innerHTML = upcoming.length > 0 ? upcoming.map(renderTodoRow).join("") : `<div class="todo-empty-section">Nothing upcoming.</div>`;
-  }
+          const overdue = active.filter((t) => t.dueDate < todayKey);
+          const today_ = active.filter((t) => t.dueDate === todayKey);
+          const upcoming = active.filter((t) => t.dueDate > todayKey);
 
-  function handleTodoListClick(e) {
-    const btn = e.target.closest("button[data-action]");
-    if (!btn) return;
-    const id = btn.dataset.id;
-    const todo = todos.find(t => t.id === id);
-    if (!todo) return;
-    if (btn.dataset.action === "toggle") toggleTodoComplete(todo);
-    else if (btn.dataset.action === "delete") deleteTodo(id);
-  }
-  document.getElementById("todo-list-overdue").addEventListener("click", handleTodoListClick);
-  document.getElementById("todo-list-today").addEventListener("click", handleTodoListClick);
-  document.getElementById("todo-list-upcoming").addEventListener("click", handleTodoListClick);
-})();
-</script>
-</body>
+          // Drop each flash snapshot back into the section matching the date it had at the
+          // moment it was clicked, forced to look done, regardless of what's happened to the
+          // real underlying task (removed, rolled forward, etc.) since.
+          flashSnapshots.forEach((snap) => {
+            if (snap.dueDate < todayKey) overdue.push(snap);
+            else if (snap.dueDate === todayKey) today_.push(snap);
+            else upcoming.push(snap);
+          });
+
+          overdueSection.style.display = overdue.length > 0 ? "block" : "none";
+          overdueEl.innerHTML = overdue.map(renderTodoRow).join("");
+          todayEl.innerHTML =
+            today_.length > 0
+              ? today_.map(renderTodoRow).join("")
+              : `<div class="todo-empty-section">Nothing due today.</div>`;
+          upcomingEl.innerHTML =
+            upcoming.length > 0
+              ? upcoming.map(renderTodoRow).join("")
+              : `<div class="todo-empty-section">Nothing upcoming.</div>`;
+        }
+
+        // short two-note chime synthesized on the fly — no audio file to host or load
+        let audioCtx = null;
+        const COMPLETE_SOUND_VOLUME = 0.1; // 0 (silent) to 1 (max); was 0.18
+        function getAudioCtx() {
+          if (!audioCtx)
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          return audioCtx;
+        }
+        // Browsers start the audio engine suspended until the person interacts with the page.
+        // Wake it on the first tap/click/keypress anywhere, so it's already running by the
+        // time the first task is checked off.
+        function unlockAudio() {
+          try {
+            const ctx = getAudioCtx();
+            if (ctx.state === "suspended") ctx.resume();
+          } catch (err) {
+            /* ignore */
+          }
+        }
+        ["pointerdown", "keydown", "touchend"].forEach((ev) =>
+          document.addEventListener(ev, unlockAudio, {
+            once: true,
+            passive: true,
+          }),
+        );
+
+        async function playCompleteSound() {
+          try {
+            const ctx = getAudioCtx();
+            // wait until the engine is actually running BEFORE reading the clock and scheduling
+            // the notes; otherwise the volume envelope plays out in the "past" and sounds quiet
+            if (ctx.state !== "running") await ctx.resume();
+            const now = audioCtx.currentTime + 0.02;
+            [523.25, 783.99].forEach((freq, i) => {
+              // C5, then G5
+              const osc = audioCtx.createOscillator();
+              const gain = audioCtx.createGain();
+              osc.type = "sine";
+              osc.frequency.value = freq;
+              const start = now + i * 0.09;
+              gain.gain.setValueAtTime(0, start);
+              gain.gain.linearRampToValueAtTime(
+                COMPLETE_SOUND_VOLUME,
+                start + 0.01,
+              );
+              gain.gain.exponentialRampToValueAtTime(0.001, start + 0.3);
+              osc.connect(gain);
+              gain.connect(audioCtx.destination);
+              osc.start(start);
+              osc.stop(start + 0.32);
+            });
+          } catch (err) {
+            console.warn("Couldn't play completion sound", err);
+          }
+        }
+
+        function handleTodoListClick(e) {
+          const btn = e.target.closest("button[data-action]");
+          if (!btn) return;
+          const id = btn.dataset.id;
+          const todo = todos.find((t) => t.id === id);
+          if (!todo) return;
+          if (btn.dataset.action === "toggle") {
+            // ignore extra clicks while this row is mid-flash, otherwise a recurring task
+            // would roll forward twice and a one-off would flip back to not-completed
+            if (flashSnapshots.has(todo.id)) return;
+            const becomingDone = !todo.completed; // true for a one-off being checked off, and
+            if (becomingDone) {
+              // every time a recurring task's instance is completed
+              playCompleteSound();
+              // Freeze a forced-"done" snapshot of this task and re-render immediately so the
+              // checkmark/strikethrough/pop are visible right away, then let it sit for a beat
+              // before handing back to the real (Firestore-driven) state — which for a one-off
+              // task means the row disappearing, and for a recurring task means it reappearing
+              // further out with a new due date.
+              flashSnapshots.set(todo.id, {
+                ...todo,
+                completed: true,
+                _flashPop: true,
+              });
+              renderTodos();
+              setTimeout(() => {
+                flashSnapshots.delete(todo.id);
+                renderTodos();
+              }, 900);
+            }
+            toggleTodoComplete(todo);
+          } else if (btn.dataset.action === "delete") deleteTodo(id);
+        }
+        document
+          .getElementById("todo-list-overdue")
+          .addEventListener("click", handleTodoListClick);
+        document
+          .getElementById("todo-list-today")
+          .addEventListener("click", handleTodoListClick);
+        document
+          .getElementById("todo-list-upcoming")
+          .addEventListener("click", handleTodoListClick);
+      })();
+    </script>
+  </body>
 </html>
