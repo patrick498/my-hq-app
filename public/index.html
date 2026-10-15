@@ -992,6 +992,30 @@
             </div>
           </div>
 
+          <div
+            class="streak-line"
+            id="reminder-bar"
+            style="justify-content: space-between"
+          >
+            <span id="reminder-status">Checking reminders…</span>
+            <button
+              id="reminder-btn"
+              style="
+                display: none;
+                background: var(--ink);
+                color: var(--paper);
+                border: none;
+                border-radius: 3px;
+                padding: 7px 12px;
+                font-size: 12.5px;
+                cursor: pointer;
+                white-space: nowrap;
+              "
+            >
+              Enable reminders
+            </button>
+          </div>
+
           <div class="block" id="todo-section-overdue" style="display: none">
             <div class="block-head">
               <h2 style="color: #8b4a3f">Overdue</h2>
@@ -1035,7 +1059,14 @@
         Timestamp,
         writeBatch,
         doc,
+        setDoc,
       } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+      import {
+        getMessaging,
+        getToken,
+        onMessage,
+        isSupported,
+      } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyBZ15HhvM6LnYhkSF1T-XXZi1WMkC4OB4A",
@@ -1050,6 +1081,10 @@
       const auth = getAuth(app);
       const db = getFirestore(app);
       const ALLOWED_UID = "uoU0LB6GMTZ4af7NWJIpE8oKsDU2";
+      // Public Web Push key: Firebase console > Project settings > Cloud Messaging >
+      // Web Push certificates > Generate key pair, then paste the key here.
+      const VAPID_KEY =
+        "BMi92uE2XM4XLsXLTN-SB1Dy9Z0gJDXbrXLV1wLtAYiO3EQE7lVitBBLQ8tPDkBVDRYfK4DIJFQQkRIQIAvFTto";
 
       (function () {
         const MOODS = [
@@ -1261,11 +1296,13 @@
               (snapshot) => {
                 todos = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
                 renderTodos();
+                backfillReminders();
               },
               (err) => {
                 console.error("Todos Firestore listen failed", err);
               },
             );
+            registerDevice(false);
           } else {
             document.getElementById("signin-gate").style.display = "flex";
             document.getElementById("root").style.display = "none";
@@ -1993,6 +2030,7 @@
                 priority: finalPriority,
                 recurrence: finalRecurrence,
                 completed: false,
+                reminderAt: reminderFor(finalDate, finalTime),
                 createdAt: serverTimestamp(),
               });
               rawInput.value = "";
@@ -2004,6 +2042,148 @@
               btn.disabled = false;
             }
           });
+
+        // ================= Reminders (push notifications) =================
+        // Each task has a reminderAt field saying when its push should go out:
+        //   Timestamp = reminder pending, null = sent or none, missing = task predates this feature.
+        // A Cloud Function checks every minute and sends the push to every registered device.
+        const REMINDER_LEAD_MINUTES = 0; // 0 = at the due time; 10 = ten minutes before
+
+        function reminderFor(dateKeyStr, timeStr) {
+          if (!dateKeyStr || !timeStr) return null;
+          const [y, m, d] = dateKeyStr.split("-").map(Number);
+          const [hh, mm] = timeStr.split(":").map(Number);
+          const when = new Date(y, m - 1, d, hh, mm, 0, 0);
+          when.setMinutes(when.getMinutes() - REMINDER_LEAD_MINUTES);
+          // a time that has already passed gets no reminder (avoids an instant push)
+          return when.getTime() > Date.now() ? Timestamp.fromDate(when) : null;
+        }
+
+        const backfillTried = new Set();
+        async function backfillReminders() {
+          if (!currentUser) return;
+          const missing = todos.filter(
+            (t) =>
+              !("reminderAt" in t) && !t.completed && !backfillTried.has(t.id),
+          );
+          if (missing.length === 0) return;
+          missing.forEach((t) => backfillTried.add(t.id));
+          try {
+            for (let i = 0; i < missing.length; i += 400) {
+              const batch = writeBatch(db);
+              missing.slice(i, i + 400).forEach((t) => {
+                batch.update(doc(db, "users", currentUser.uid, "todos", t.id), {
+                  reminderAt: reminderFor(t.dueDate, t.dueTime),
+                });
+              });
+              await batch.commit();
+            }
+          } catch (err) {
+            console.warn("Couldn't backfill reminders", err);
+          }
+        }
+
+        const reminderStatusEl = document.getElementById("reminder-status");
+        const reminderBtn = document.getElementById("reminder-btn");
+        function setReminderUI(text, showButton) {
+          reminderStatusEl.textContent = text;
+          reminderBtn.style.display = showButton ? "inline-block" : "none";
+        }
+
+        let swRegistration = null;
+        let foregroundHandlerSet = false;
+
+        // Registers this device for push. askPermission=true only from the button tap (browsers
+        // require a user gesture); the silent call after sign-in just refreshes the token.
+        async function registerDevice(askPermission) {
+          try {
+            if (!currentUser) return;
+            if (
+              !("Notification" in window) ||
+              !("serviceWorker" in navigator) ||
+              !(await isSupported())
+            ) {
+              setReminderUI("This browser can't show push reminders.", false);
+              return;
+            }
+            if (VAPID_KEY.startsWith("PASTE_")) {
+              setReminderUI(
+                "Reminders aren't set up yet: add your VAPID key in index.html.",
+                false,
+              );
+              return;
+            }
+            if (Notification.permission === "denied") {
+              setReminderUI(
+                "Notifications are blocked for this site. Allow them in your browser's site settings.",
+                false,
+              );
+              return;
+            }
+            if (Notification.permission === "default") {
+              if (!askPermission) {
+                setReminderUI("Reminders are off on this device.", true);
+                return;
+              }
+              const result = await Notification.requestPermission();
+              if (result !== "granted") {
+                setReminderUI(
+                  result === "denied"
+                    ? "Notifications are blocked for this site. Allow them in your browser's site settings."
+                    : "Reminders are off on this device.",
+                  result !== "denied",
+                );
+                return;
+              }
+            }
+            if (!swRegistration) {
+              swRegistration = await navigator.serviceWorker.register(
+                "firebase-messaging-sw.js",
+              );
+              await navigator.serviceWorker.ready;
+            }
+            const messaging = getMessaging(app);
+            const token = await getToken(messaging, {
+              vapidKey: VAPID_KEY,
+              serviceWorkerRegistration: swRegistration,
+            });
+            if (!token) {
+              setReminderUI(
+                "Couldn't get a notification token. Try again.",
+                true,
+              );
+              return;
+            }
+            await setDoc(
+              doc(db, "users", currentUser.uid, "devices", token),
+              {
+                token,
+                timeZone:
+                  Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+                userAgent: navigator.userAgent.slice(0, 200),
+                updatedAt: serverTimestamp(),
+              },
+              { merge: true },
+            );
+            if (!foregroundHandlerSet) {
+              foregroundHandlerSet = true;
+              // while the app is open and visible, show the reminder ourselves
+              onMessage(messaging, (payload) => {
+                const d = payload.data || {};
+                swRegistration.showNotification(d.title || "HQ", {
+                  body: d.body || "",
+                  tag: d.tag || undefined,
+                  data: { url: d.url || "./" },
+                });
+              });
+            }
+            setReminderUI("Reminders are on for this device.", false);
+          } catch (err) {
+            console.error("Reminder setup failed", err);
+            setReminderUI("Couldn't set up reminders: " + err.message, true);
+          }
+        }
+        reminderBtn.addEventListener("click", () => registerDevice(true));
 
         async function toggleTodoComplete(todo) {
           if (!currentUser) return;
@@ -2018,9 +2198,15 @@
                 nextDate = addDays(todo.dueDate, 7);
               else if (todo.recurrence === "monthly")
                 nextDate = addMonths(todo.dueDate, 1);
-              await updateDoc(ref, { dueDate: nextDate });
+              await updateDoc(ref, {
+                dueDate: nextDate,
+                reminderAt: reminderFor(nextDate, todo.dueTime),
+              });
             } else {
-              await updateDoc(ref, { completed: !todo.completed });
+              await updateDoc(ref, {
+                completed: !todo.completed,
+                reminderAt: null,
+              });
             }
           } catch (err) {
             alert("Couldn't update: " + err.message);

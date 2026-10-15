@@ -69,3 +69,4 @@ node_modules/
 .dataconnect
 firebase-debug.log
 *-debug.log
+functions/node_modules
