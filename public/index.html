@@ -1913,7 +1913,15 @@
           };
 
           // recurrence
-          if (/\b(every day|daily)\b/i.test(text)) {
+          // "every monday" = weekly, starting on the next Monday (today if it is Monday).
+          // Only "every" is removed here; the day name is left for the date parsing below.
+          const everyWdMatch = text.match(
+            /\bevery\s+(sunday|monday|tuesday|wednesday|thursday|friday|saturday)\b/i,
+          );
+          if (everyWdMatch) {
+            result.recurrence = "weekly";
+            text = text.replace(everyWdMatch[0], " " + everyWdMatch[1] + " ");
+          } else if (/\b(every day|daily)\b/i.test(text)) {
             result.recurrence = "daily";
             text = text.replace(/\b(every day|daily)\b/i, " ");
           } else if (/\b(every week|weekly)\b/i.test(text)) {
@@ -1976,6 +1984,7 @@
                 const todayIdx = new Date(ty, tm - 1, td).getDay();
                 let diff = (targetIdx - todayIdx + 7) % 7;
                 if (diff === 0 || wdMatch[1]) diff += diff === 0 ? 7 : 0; // "next" or same-day-name pushes to next week
+                if (everyWdMatch && !wdMatch[1] && targetIdx === todayIdx) diff = 0; // "every monday" on a Monday starts today
                 result.dateKey = addDays(todayKey, diff);
                 text = text.replace(wdMatch[0], " ");
               }
