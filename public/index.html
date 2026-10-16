@@ -2209,12 +2209,16 @@
             if (!foregroundHandlerSet) {
               foregroundHandlerSet = true;
               // while the app is open and visible, show the reminder ourselves
+              // (same notification as in firebase-messaging-sw.js, which handles the Complete button)
               onMessage(messaging, (payload) => {
                 const d = payload.data || {};
                 swRegistration.showNotification(d.title || "HQ", {
                   body: d.body || "",
                   tag: d.tag || undefined,
-                  data: { url: d.url || "./" },
+                  data: { url: d.url || "./", taskId: d.tag || "" },
+                  actions: d.tag
+                    ? [{ action: "complete", title: "✓ Complete" }]
+                    : [],
                 });
               });
             }
