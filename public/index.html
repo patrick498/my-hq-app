@@ -1939,12 +1939,12 @@
             text = text.replace(pMatch[0], " ");
           }
 
-          // time: "3pm", "3:30pm", "15:00", "at 9"
+          // time: "3pm", "3:30pm", "15:00", "at 9" ("11;04" works too, a common typo for "11:04")
           // scan ALL number-ish candidates and use the first one that actually looks like
           // a time (has a colon or am/pm) — a bare digit elsewhere in the text (like in
           // "test 1" or "in 3 days") must not stop the search early.
           const timeCandidates = [
-            ...text.matchAll(/\b(?:at\s+)?(\d{1,2})(:(\d{2}))?\s*(am|pm)?\b/gi),
+            ...text.matchAll(/\b(?:at\s+)?(\d{1,2})([:;](\d{2}))?\s*(am|pm)?\b/gi),
           ];
           const timeMatch = timeCandidates.find((m) => m[4] || m[2]);
           if (timeMatch) {
