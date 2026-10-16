@@ -412,6 +412,45 @@
         padding: 4px 2px;
       }
 
+      .todo-edit-input {
+        padding: 8px 9px;
+        border: 1px solid var(--rule);
+        border-radius: 3px;
+        background: #fff;
+        color: var(--ink);
+        font-family: inherit;
+        font-size: 14px;
+      }
+      .todo-edit-input:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+      .todo-edit-fields {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+      .todo-edit-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-top: 10px;
+      }
+      .todo-edit-save {
+        background: var(--ink);
+        color: var(--paper);
+        border: none;
+        border-radius: 3px;
+        padding: 7px 16px;
+        font-size: 13px;
+        font-family: inherit;
+        cursor: pointer;
+      }
+      .todo-edit-save:hover {
+        background: var(--accent-ink);
+      }
+
       @media (max-width: 420px) {
         #root {
           padding: 20px 12px 40px;
@@ -1234,6 +1273,8 @@
           Object.keys(history).forEach((k) => delete history[k]);
           mpEntries = [];
           todos = [];
+          editingId = null;
+          editDraft = null;
 
           if (user) {
             document.getElementById("signin-gate").style.display = "none";
@@ -2243,6 +2284,8 @@
         }
 
         function renderTodoRow(t) {
+          if (t.id === editingId && editDraft && !t._flashPop)
+            return renderTodoEditRow(t);
           const recurLabel =
             t.recurrence && t.recurrence !== "none"
               ? `<span class="todo-recur">↻ ${escapeHtml(t.recurrence)}</span>`
@@ -2256,7 +2299,7 @@
         <div class="todo-title" style="${done ? "text-decoration:line-through; color:var(--ink-soft);" : ""}">${escapeHtml(t.title)}</div>
         <div class="todo-meta">${todoDueLabel(t)}${recurLabel}</div>
       </div>
-      <button class="entry-delete" data-action="delete" data-id="${t.id}">delete</button>
+      <span style="display:flex; gap:2px; flex:0 0 auto;">${t._flashPop ? "" : `<button class="entry-delete" data-action="edit" data-id="${t.id}">edit</button>`}<button class="entry-delete" data-action="delete" data-id="${t.id}">delete</button></span>
     </div>`;
         }
 
@@ -2266,7 +2309,134 @@
         // instantly, and even though recurring tasks never actually end up with completed:true.
         const flashSnapshots = new Map();
 
+        // ---- editing a task in place ----
+        // Only one row is edited at a time. The text being typed lives in editDraft, not in
+        // the DOM, because the live Firestore listener re-renders the lists whenever anything
+        // changes (for example the reminder function updating a task), which would otherwise
+        // wipe whatever the person was in the middle of typing.
+        let editingId = null;
+        let editDraft = null;
+
+        function renderTodoEditRow(t) {
+          return `<div class="todo-row">
+      <div class="todo-priority-bar" style="background:${PRIORITY_COLORS[t.priority] || PRIORITY_COLORS[4]};"></div>
+      <div class="todo-main">
+        <input type="text" class="todo-edit-input" data-edit-field="title" maxlength="160"
+          aria-label="Task text" value="${escapeHtml(editDraft.title)}" style="width:100%;" />
+        <div class="todo-edit-fields">
+          <input type="date" class="todo-edit-input" data-edit-field="date" aria-label="Due date"
+            value="${escapeHtml(editDraft.date)}" />
+          <input type="time" class="todo-edit-input" data-edit-field="time" aria-label="Due time"
+            value="${escapeHtml(editDraft.time)}" />
+        </div>
+        <div class="todo-edit-actions">
+          <button class="todo-edit-save" data-action="save-edit" data-id="${t.id}">Save</button>
+          <button class="entry-delete" data-action="cancel-edit" data-id="${t.id}">cancel</button>
+        </div>
+      </div>
+    </div>`;
+        }
+
+        // keep the cursor where it was when a live update re-renders the list mid-edit
+        function captureEditFocus() {
+          const a = document.activeElement;
+          if (a && a.dataset && a.dataset.editField) {
+            return {
+              field: a.dataset.editField,
+              start: a.selectionStart,
+              end: a.selectionEnd,
+            };
+          }
+          return null;
+        }
+        function restoreEditFocus(state) {
+          if (!state) return;
+          const el = document.querySelector(
+            `[data-edit-field="${state.field}"]`,
+          );
+          if (!el) return;
+          el.focus();
+          try {
+            if (state.start != null && el.setSelectionRange)
+              el.setSelectionRange(state.start, state.end);
+          } catch (err) {
+            /* date and time inputs have no text selection */
+          }
+        }
+
+        function startEdit(todo) {
+          if (flashSnapshots.has(todo.id)) return;
+          editingId = todo.id;
+          editDraft = {
+            title: todo.title || "",
+            date: todo.dueDate || todayKey,
+            time: todo.dueTime || "09:00",
+          };
+          renderTodos();
+          const titleEl = document.querySelector('[data-edit-field="title"]');
+          if (titleEl) {
+            titleEl.focus();
+            titleEl.select();
+          }
+        }
+        function cancelEdit() {
+          editingId = null;
+          editDraft = null;
+          renderTodos();
+        }
+        async function saveEdit() {
+          if (!currentUser || !editingId || !editDraft) return;
+          const id = editingId;
+          const todo = todos.find((t) => t.id === id);
+          if (!todo) {
+            cancelEdit();
+            return;
+          }
+          const draft = { ...editDraft };
+          const title = (draft.title || "").trim();
+          if (!title) {
+            alert("The task needs some text.");
+            return;
+          }
+          const date = draft.date || todo.dueDate;
+          const time = draft.time || todo.dueTime || "09:00";
+          const changes = {};
+          if (title !== todo.title) changes.title = title;
+          if (date !== todo.dueDate) changes.dueDate = date;
+          if (time !== todo.dueTime) changes.dueTime = time;
+          // a new date or time means a new reminder; the old, possibly already-sent one is replaced
+          if (!todo.completed && (changes.dueDate || changes.dueTime)) {
+            changes.reminderAt = reminderFor(date, time);
+          }
+
+          // leave edit mode right away; reopen it with the typed text if the save fails
+          editingId = null;
+          editDraft = null;
+          renderTodos();
+          if (Object.keys(changes).length === 0) return;
+          try {
+            await updateDoc(
+              doc(db, "users", currentUser.uid, "todos", id),
+              changes,
+            );
+          } catch (err) {
+            editingId = id;
+            editDraft = draft;
+            renderTodos();
+            alert("Couldn't save the changes: " + err.message);
+          }
+        }
+
         function renderTodos() {
+          const focusState = captureEditFocus();
+          // the task being edited was deleted or completed elsewhere: drop the edit form
+          if (
+            editingId &&
+            !todos.some((t) => t.id === editingId && !t.completed)
+          ) {
+            editingId = null;
+            editDraft = null;
+          }
           const overdueEl = document.getElementById("todo-list-overdue");
           const todayEl = document.getElementById("todo-list-today");
           const upcomingEl = document.getElementById("todo-list-upcoming");
@@ -2309,6 +2479,7 @@
             upcoming.length > 0
               ? upcoming.map(renderTodoRow).join("")
               : `<div class="todo-empty-section">Nothing upcoming.</div>`;
+          restoreEditFocus(focusState);
         }
 
         // short two-note chime synthesized on the fly — no audio file to host or load
@@ -2399,6 +2570,9 @@
             }
             toggleTodoComplete(todo);
           } else if (btn.dataset.action === "delete") deleteTodo(id);
+          else if (btn.dataset.action === "edit") startEdit(todo);
+          else if (btn.dataset.action === "save-edit") saveEdit();
+          else if (btn.dataset.action === "cancel-edit") cancelEdit();
         }
         document
           .getElementById("todo-list-overdue")
@@ -2409,6 +2583,28 @@
         document
           .getElementById("todo-list-upcoming")
           .addEventListener("click", handleTodoListClick);
+
+        ["todo-list-overdue", "todo-list-today", "todo-list-upcoming"].forEach(
+          (listId) => {
+            const listEl = document.getElementById(listId);
+            ["input", "change"].forEach((evName) =>
+              listEl.addEventListener(evName, (e) => {
+                const field = e.target.dataset && e.target.dataset.editField;
+                if (field && editDraft) editDraft[field] = e.target.value;
+              }),
+            );
+            listEl.addEventListener("keydown", (e) => {
+              if (!e.target.dataset || !e.target.dataset.editField) return;
+              if (e.key === "Enter") {
+                e.preventDefault();
+                saveEdit();
+              } else if (e.key === "Escape") {
+                e.preventDefault();
+                cancelEdit();
+              }
+            });
+          },
+        );
       })();
     </script>
   </body>
