@@ -16,6 +16,12 @@ firebase.initializeApp(firebaseConfig);
 
 const messaging = firebase.messaging();
 
+// Take over as soon as a new version is downloaded, instead of waiting until every HQ
+// window is closed (an installed app on Android can stay open in the background for
+// days, so the old notification code would otherwise keep running).
+self.addEventListener("install", () => self.skipWaiting());
+self.addEventListener("activate", (event) => event.waitUntil(clients.claim()));
+
 // Keep in step with REMINDER_LEAD_MINUTES in index.html.
 const REMINDER_LEAD_MINUTES = 0;
 
