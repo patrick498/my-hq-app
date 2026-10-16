@@ -2481,6 +2481,14 @@
             else if (snap.dueDate === todayKey) today_.push(snap);
             else upcoming.push(snap);
           });
+          // Put the snapshots back where they were instead of at the end of the section:
+          // same order as the Firestore query (dueDate, dueTime, then document id for ties).
+          const byListOrder = (a, b) =>
+            (a.dueDate || "").localeCompare(b.dueDate || "") ||
+            (a.dueTime || "").localeCompare(b.dueTime || "") ||
+            (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+          if (flashSnapshots.size > 0)
+            [overdue, today_, upcoming].forEach((list) => list.sort(byListOrder));
 
           overdueSection.style.display = overdue.length > 0 ? "block" : "none";
           overdueEl.innerHTML = overdue.map(renderTodoRow).join("");
@@ -2579,7 +2587,7 @@
               setTimeout(() => {
                 flashSnapshots.delete(todo.id);
                 renderTodos();
-              }, 900);
+              }, 1000);
             }
             toggleTodoComplete(todo);
           } else if (btn.dataset.action === "delete") deleteTodo(id);
